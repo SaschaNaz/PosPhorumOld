@@ -2,8 +2,7 @@
     x:Class="Posroid.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Posroid"
-    RequestedTheme="Light">
+    xmlns:local="using:Posroid">
 
     <Application.Resources>
         <ResourceDictionary>
@@ -17,6 +16,8 @@
                 <ResourceDictionary>
                     <local:DateConverter x:Key="dateConverter" />
                     <local:LanguageConverter x:Key="languageConverter" />
+                    <local:DayBrushConverter x:Key="dayBrushConverter" />
+                    <local:MealFoodConverter x:Key="mealFoodConverter" />
                     <x:String x:Key="preferedLanguage">en-US</x:String>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>

@@ -56,12 +56,24 @@
             Grid.Row="1"
             Margin="0,-3,0,0"
             Padding="116,0,40,46"
-            ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}">
+            ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}" >
             <GridView.ItemTemplate>
                 <DataTemplate>
-                    <Grid HorizontalAlignment="Left" Height="250" Width="250">
+                    <Grid HorizontalAlignment="Left" Height="220" Width="300">
+                        <TextBlock Foreground="{StaticResource ListViewItemOverlayForegroundThemeBrush}" Height="60" Margin="15,0,15,0" Style="{StaticResource TitleTextStyle}" Text="{Binding Mealtime}"/>
                         <Border Background="{StaticResource ListViewItemPlaceholderBackgroundThemeBrush}">
-                            <Image Source="{Binding Image}" Stretch="UniformToFill"/>
+                            <ItemsControl Margin="0,40,0,0" ItemsSource="{Binding WhatFoods}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Type}" Foreground="White" Margin="20" FontSize="50" FontWeight="Light"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </Border>
                         <StackPanel Background="{StaticResource ListViewItemOverlayBackgroundThemeBrush}" VerticalAlignment="Bottom">
                             <TextBlock Foreground="{StaticResource ListViewItemOverlayForegroundThemeBrush}" Height="60" Margin="15,0,15,0" Style="{StaticResource TitleTextStyle}" Text="{Binding Mealtime}"/>
@@ -93,7 +105,7 @@
                     </GroupStyle.HeaderTemplate>
                     <GroupStyle.Panel>
                         <ItemsPanelTemplate>
-                            <VariableSizedWrapGrid Orientation="Vertical" Margin="0,0,80,0"/>
+                            <VariableSizedWrapGrid Orientation="Vertical" Margin="0,0,80,0" />
                         </ItemsPanelTemplate>
                     </GroupStyle.Panel>
                 </GroupStyle>
