@@ -129,4 +129,92 @@ namespace Posroid
             throw new NotImplementedException();
         }
     }
+
+    public class DayBrushConverter : Windows.UI.Xaml.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string culture)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value", "Value cannot be null.");
+
+            if (!typeof(DateTime).Equals(value.GetType()))
+                throw new ArgumentException("Value must be of type DateTime.", "value");
+
+            DayOfWeek dayofweek = ((DateTime)value).DayOfWeek;
+
+            if (dayofweek == DayOfWeek.Monday)
+            {
+                return new SolidColorBrush(new Windows.UI.Color() { A = 0xFF, R = 0xFF, G = 0x66, B = 0x66 });
+            }
+            else if (dayofweek == DayOfWeek.Tuesday)
+            {
+                return new SolidColorBrush(new Windows.UI.Color() { A = 0xFF, R = 0xFF, G = 0xC1, B = 0x66 });
+            }
+            else if (dayofweek == DayOfWeek.Wednesday)
+            {
+                return new SolidColorBrush(new Windows.UI.Color() { A = 0xFF, R = 0xFF, G = 0xFF, B = 0x66 });
+            }
+            else if (dayofweek == DayOfWeek.Thursday)
+            {
+                return new SolidColorBrush(new Windows.UI.Color() { A = 0xFF, R = 0x66, G = 0xFF, B = 0x66 });
+            }
+            else if (dayofweek == DayOfWeek.Friday)
+            {
+                return new SolidColorBrush(new Windows.UI.Color() { A = 0xFF, R = 0x66, G = 0x66, B = 0xFF });
+            }
+            else if (dayofweek == DayOfWeek.Saturday)
+            {
+                return new SolidColorBrush(new Windows.UI.Color() { A = 0xFF, R = 0xC1, G = 0x66, B = 0xFF });
+            }
+            else if (dayofweek == DayOfWeek.Sunday)
+            {
+                return new SolidColorBrush(new Windows.UI.Color() { A = 0xFF, R = 0xFF, G = 0x66, B = 0xFF });
+            }
+            else
+            {
+                return new SolidColorBrush(Windows.UI.Colors.Black);
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class MealFoodConverter : Windows.UI.Xaml.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string culture)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value", "Value cannot be null.");
+
+            if (!typeof(Time[]).Equals(value.GetType()))
+                throw new ArgumentException("Value must be of type Time array.", "value");
+
+            Time[] times = (Time[])value;
+
+            if (times == null)
+            {
+                return new Time[] { };
+            }
+            else
+            {
+                List<MealBlock> infolist = new List<MealBlock>();
+                foreach (Time time in times)
+                {
+                    foreach (FoodsInfo info in time.WhatFoods)
+                    {
+                        infolist.Add(new MealBlock(info.Type, time.Mealtime, info.Kilocalories) { Margin = new Thickness(20,20,0,0), Width = 120, Height = 120 });
+                    }
+                }
+                return infolist.ToArray();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

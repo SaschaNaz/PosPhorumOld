@@ -1,6 +1,6 @@
 ﻿<common:LayoutAwarePage
     x:Name="pageRoot"
-    x:Class="Posroid.MainPage"
+    x:Class="Posroid.CustomGroupedPage"
     DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
     IsTabStop="false"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -19,12 +19,9 @@
         -->
         <CollectionViewSource
             x:Name="groupedItemsViewSource"
-            Source="{Binding Groups}"
-            IsSourceGrouped="true"
-            ItemsPath="Times"/>
-
+            Source="{Binding Groups}" />
         <!-- TODO: Delete this line if the key AppName is declared in App.xaml -->
-        <x:String x:Key="AppName">Postech Diet Menu</x:String>
+        <x:String x:Key="AppName">Posmetro Diet</x:String>
     </Page.Resources>
 
     <!--
@@ -47,23 +44,44 @@
             <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
             <TextBlock x:Name="pageTitle" Grid.Column="1" Text="{StaticResource AppName}" Style="{StaticResource PageHeaderTextStyle}"/>
         </Grid>
-        <ItemsControl x:Name="UIList" Grid.Row="1">
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}" >
             <!--http://msdn.microsoft.com/en-us/library/system.windows.controls.itemspaneltemplate.aspx-->
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" />
+                    <StackPanel Orientation="Horizontal" Margin="110,10,110,100"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.Template>
                 <ControlTemplate TargetType="ItemsControl">
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" ZoomMode="Disabled" VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Hidden">
-                        <ItemsPresenter Margin="110,10,110,40" />
+                        <ItemsPresenter />
                     </ScrollViewer>
                 </ControlTemplate>
             </ItemsControl.Template>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <local:DietDay Width="400" />
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="80" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Button Style="{StaticResource TextButtonStyle}" Content="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD-dayofweek}"/>
+                        <Rectangle Grid.Row="1" Height="20" Fill="{Binding ServedDate, Converter={StaticResource dayBrushConverter}}" VerticalAlignment="Top" Margin="20,10,50,0" />
+                        <ItemsControl Grid.Row="1" Width="330" Background="Beige" ItemsSource="{Binding Times, Converter={StaticResource mealFoodConverter}}" Margin="0,30,0,0" >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VariableSizedWrapGrid Orientation="Vertical" Margin="0,0,80,0" 
+                                                           MaximumRowsOrColumns="4"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <!--<ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <local:MealBlock Background="Black" Width="120" Height="120" Margin="10" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>-->
+                        </ItemsControl>
+                        <!--<WrapGrid Grid.Row="1" Width="400" Background="Beige" />-->
+                    </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
