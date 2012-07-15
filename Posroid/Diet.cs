@@ -7,6 +7,24 @@ using System.Xml.Linq;
 
 namespace Posroid
 {
+    interface IMealBlock
+    {
+        MealData InternalData { get; }
+    }
+
+    class MealData
+    {
+        public FoodsInfo FoodInformations { get; private set; }
+        public When Mealtime { get; private set; }
+        public DateTime ServedDate { get; private set; }
+        public MealData(FoodsInfo info, When mealtime, DateTime date)
+        {
+            FoodInformations = info;
+            Mealtime = mealtime;//When enum으로 바로 받도록 하고 When->String 컨버터 만들기
+            ServedDate = date;
+        }
+    }
+
     class DietMenu
     {
         public Day[] Days { get; private set; }
@@ -23,6 +41,48 @@ namespace Posroid
     class Day
     {
         public Time[] Times { get; private set; }
+        public Windows.UI.Xaml.UIElement[] TotalFoodsInfo
+        {
+            get
+            {
+                List<Windows.UI.Xaml.UIElement> infolist = new List<Windows.UI.Xaml.UIElement>();
+                foreach (Time time in Times)
+                {
+                    Int32 i = 0;
+                    Int32 lastNumber = 0;
+                    Int32 lastCalories = 0;
+                    foreach (FoodsInfo info in time.WhatFoods)
+                    {
+                        //smalllist.Add(new MealBlockShort(info.Type, time.Mealtime, info.Kilocalories));
+                        if (lastCalories < info.Kilocalories)
+                        {
+                            lastCalories = info.Kilocalories;
+                            lastNumber = i;
+                        }
+                        i++;
+                    }
+                    List<FoodsInfo> foods = time.WhatFoods.ToList();
+                    if (i != 0)
+                        foods.RemoveAt(lastNumber);
+                    List<Windows.UI.Xaml.UIElement> smalllist = new List<Windows.UI.Xaml.UIElement>();
+                    foreach (FoodsInfo info in foods)
+                    {
+                        smalllist.Add(new MealBlockShort(new MealData(info, time.Mealtime, ServedDate)) { Width = 130, Height = 130 });
+                    }
+                    if (i != 0)
+                    {
+                        FoodsInfo highest = time.WhatFoods[lastNumber];
+                        smalllist.Insert(lastNumber, new MealBlockWide(new MealData(highest, time.Mealtime, ServedDate)) { Width = 130, Height = 270 });
+                    }
+                    
+                        //smalllist[lastNumber].Width = (d + 10) * 2 - 10;
+                    infolist.AddRange(smalllist);
+                    //가로만 확장하면 영 어색하므로 그에 맞게 최적화
+                    //저 랩그리드 무한히 안 가도록 새로운 패널 만들기 ㅎㅎ 그냥 아이템즈컨트롤에 ArrangeOverride 같은 걸 씌우나?
+                }
+                return infolist.ToArray();
+            }
+        }
         public DateTime ServedDate { get; private set; }
         public Day(XElement day)
         {
@@ -70,6 +130,8 @@ namespace Posroid
     }
     class FoodsInfo
     {
+        //public Boolean HighestCalories = false;
+
         public Food[] Foods { get; private set; }
         public Int32 Kilocalories { get; private set; }
         public String Type { get; private set; }

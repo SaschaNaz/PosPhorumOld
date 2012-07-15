@@ -70,6 +70,14 @@ namespace Posroid
                 DateTimeFormatter dateFormatter3 = new DateTimeFormatter("{dayofweek.full}");
                 return String.Format("{0}/{1}\n{2}", dateFormatter1.Format(dt), dateFormatter2.Format(dt), dateFormatter3.Format(dt));
             }
+            else if ((string)parameter == "MM/DD/dayofweek")
+            {
+
+                DateTimeFormatter dateFormatter1 = new DateTimeFormatter("{month.integer(2)}");
+                DateTimeFormatter dateFormatter2 = new DateTimeFormatter("{day.integer(2)}");
+                DateTimeFormatter dateFormatter3 = new DateTimeFormatter("{dayofweek.full}");
+                return String.Format("{0}/{1}/{2}", dateFormatter1.Format(dt), dateFormatter2.Format(dt), dateFormatter3.Format(dt));
+            }
             else if ((string)parameter == "dayofweek")
             {
                 DateTimeFormatter dateFormatter = new DateTimeFormatter("{dayofweek.full}");
@@ -182,33 +190,51 @@ namespace Posroid
         }
     }
 
-    public class MealFoodConverter : Windows.UI.Xaml.Data.IValueConverter
+    //public class MealInfoConverter : Windows.UI.Xaml.Data.IValueConverter
+    //{
+    //    public object Convert(object value, Type targetType, object parameter, string culture)
+    //    {
+    //        if (value == null)
+    //            throw new ArgumentNullException("value", "Value cannot be null.");
+
+    //        IMealBlock block = value as IMealBlock;
+
+    //        if (block == null)
+    //        {
+    //            throw new ArgumentException("Value must be of type IMealBlock.", "value");
+    //        }
+
+    //        return ((IMealBlock)value).InternalData;
+    //    }
+
+    //    public object ConvertBack(object value, Type targetType, object parameter, string culture)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
+
+    public class MealtimeStringConverter : Windows.UI.Xaml.Data.IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string culture)
         {
             if (value == null)
                 throw new ArgumentNullException("value", "Value cannot be null.");
 
-            if (!typeof(Time[]).Equals(value.GetType()))
-                throw new ArgumentException("Value must be of type Time array.", "value");
+            if (!typeof(When).Equals(value.GetType()))
+                throw new ArgumentException("Value must be of type When.", "value");
 
-            Time[] times = (Time[])value;
+            When mealtime = (When)value;
 
-            if (times == null)
+            switch (mealtime)
             {
-                return new Time[] { };
-            }
-            else
-            {
-                List<MealBlock> infolist = new List<MealBlock>();
-                foreach (Time time in times)
-                {
-                    foreach (FoodsInfo info in time.WhatFoods)
-                    {
-                        infolist.Add(new MealBlock(info.Type, time.Mealtime, info.Kilocalories) { Margin = new Thickness(20,20,0,0), Width = 120, Height = 120 });
-                    }
-                }
-                return infolist.ToArray();
+                case When.Breakfast:
+                    return "Breakfast";
+                case When.Lunch:
+                    return "Lunch";
+                case When.Dinner:
+                    return "Dinner";
+                default:
+                    return "(Error)";
             }
         }
 
@@ -217,4 +243,138 @@ namespace Posroid
             throw new NotImplementedException();
         }
     }
+
+    public class MealtimeBrushConverter : Windows.UI.Xaml.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string culture)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value", "Value cannot be null.");
+
+            if (!typeof(When).Equals(value.GetType()))
+                throw new ArgumentException("Value must be of type When.", "value");
+
+            When mealtime = (When)value;
+
+            switch (mealtime)
+            {
+                case When.Breakfast:
+                    return new SolidColorBrush(new Windows.UI.Color() { A = 0xFF, R = 0x0E, G = 0x9C, B = 0x00 });
+                case When.Lunch:
+                    return new SolidColorBrush(new Windows.UI.Color() { A = 0xFF, R = 0x00, G = 0x63, B = 0x9C });
+                case When.Dinner:
+                    return new SolidColorBrush(new Windows.UI.Color() { A = 0xFF, R = 0xE0, G = 0x00, B = 0x85 });
+                default:
+                    return new SolidColorBrush(Windows.UI.Colors.Transparent);
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class IntCaloriesConverter : Windows.UI.Xaml.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string culture)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value", "Value cannot be null.");
+
+            if (!typeof(Int32).Equals(value.GetType()))
+                throw new ArgumentException("Value must be of type Int32.", "value");
+
+            Int32 cal = (Int32)value;
+
+            return String.Format("{0}kcal", cal);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    //public class MealFoodConverter : Windows.UI.Xaml.Data.IValueConverter
+    //{
+    //    public object Convert(object value, Type targetType, object parameter, string culture)
+    //    {
+    //        if (value == null)
+    //            throw new ArgumentNullException("value", "Value cannot be null.");
+
+    //        if (!typeof(Time[]).Equals(value.GetType()))
+    //            throw new ArgumentException("Value must be of type Time array.", "value");
+
+    //        Time[] times = (Time[])value;
+
+    //        if (times == null)
+    //        {
+    //            return new Time[] { };
+    //        }
+    //        else
+    //        {
+    //            List<MealBlockShort> infolist = new List<MealBlockShort>();
+    //            foreach (Time time in times)
+    //            {
+    //                List<MealBlockShort> smalllist = new List<MealBlockShort>();
+    //                Int32 i = 0;
+    //                Int32 lastNumber = 0;
+    //                Int32 lastCalories = 0;
+    //                foreach (FoodsInfo info in time.WhatFoods)
+    //                {
+    //                    smalllist.Add(new MealBlockShort(info.Type, time.Mealtime, info.Kilocalories) { Width = 120, Height = 120 });
+    //                    if (lastCalories < info.Kilocalories)
+    //                    {
+    //                        lastCalories = info.Kilocalories;
+    //                        lastNumber = i;
+    //                    }
+    //                    i++;
+    //                }
+    //                if (i != 0)
+    //                {
+    //                    Double d = smalllist[lastNumber].Width;
+    //                    smalllist[lastNumber].Width = (d + 10) * 2 - 10;
+    //                }
+    //                infolist.AddRange(smalllist);
+    //                //가로만 확장하면 영 어색하므로 그에 맞게 최적화
+    //                //저 랩그리드 무한히 안 가도록 새로운 패널 만들기 ㅎㅎ 그냥 아이템즈컨트롤에 ArrangeOverride 같은 걸 씌우나?
+    //            }
+    //            return infolist.ToArray();
+    //        }
+    //    }
+
+    //    public object ConvertBack(object value, Type targetType, object parameter, string culture)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
+
+    //public class HeightConverter : Windows.UI.Xaml.Data.IValueConverter
+    //{
+    //    public object Convert(object value, Type targetType, object parameter, string culture)
+    //    {
+    //        if (value == null)
+    //            throw new ArgumentNullException("value", "Value cannot be null.");
+
+    //        if (!typeof(Double).Equals(value.GetType()))
+    //            throw new ArgumentException("Value must be of type double.", "value");
+
+    //        Double times = (Double)value;
+
+    //        if (times < 190)
+    //        {
+    //            return 0;
+    //        }
+    //        else
+    //        {
+    //            return times - 190;
+    //        }
+    //    }
+
+    //    public object ConvertBack(object value, Type targetType, object parameter, string culture)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
 }
