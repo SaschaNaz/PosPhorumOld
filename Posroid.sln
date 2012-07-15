@@ -4,6 +4,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Posroid", "Posroid\Posroid.csproj", "{AA25704B-59B9-4154-80DE-A9CED0713812}"
 EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccLocalPath0 = .
+		SccLocalPath1 = Posroid
+		SccNumberOfProjects = 2
+		SccProjectName1 = Posroid
+		SccProjectUniqueName1 = Posroid\\Posroid.csproj
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs33
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
 		Debug|Any CPU = Debug|Any CPU

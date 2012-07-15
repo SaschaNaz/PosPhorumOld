@@ -113,8 +113,15 @@
     <Compile Include="Common\BindableBase.cs" />
     <Compile Include="Common\BooleanNegationConverter.cs" />
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
+    <Compile Include="MealBlockWide.xaml.cs">
+      <DependentUpon>MealBlockWide.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomGridView.cs" />
     <Compile Include="CustomGroupedPage.xaml.cs">
       <DependentUpon>CustomGroupedPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DietGroupedPage.xaml.cs">
+      <DependentUpon>DietGroupedPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="GroupedItemsPage1.xaml.cs">
       <DependentUpon>GroupedItemsPage1.xaml</DependentUpon>
@@ -129,8 +136,8 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MealBlock.xaml.cs">
-      <DependentUpon>MealBlock.xaml</DependentUpon>
+    <Compile Include="MealBlockShort.xaml.cs">
+      <DependentUpon>MealBlockShort.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -146,7 +153,15 @@
     <Content Include="Assets\SmallLogo.png" />
     <Content Include="Assets\SplashScreen.png" />
     <Content Include="Assets\StoreLogo.png" />
-    <Page Include="MealBlock.xaml">
+    <Page Include="MealBlockWide.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DietGroupedPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MealBlockShort.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

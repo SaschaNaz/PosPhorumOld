@@ -51,7 +51,7 @@ namespace Posroid
 
             // Create a Frame to act navigation context and navigate to the first page
             var rootFrame = new Frame();
-            if (!rootFrame.Navigate(typeof(CustomGroupedPage)))
+            if (!rootFrame.Navigate(typeof(DietGroupedPage)))
             {
                 throw new Exception("Failed to create initial page");
             }
