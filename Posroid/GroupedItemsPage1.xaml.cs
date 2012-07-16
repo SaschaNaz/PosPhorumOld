@@ -191,7 +191,7 @@ namespace Posroid
                     str += fontcode.Value;
                 }
                 if (str.Length > 0)
-                    strfood.Add(code.Elements().First().Value);
+                    strfood.Add(str);
             }
 
             XElement xfoods = new XElement("Foods", new XAttribute("Type", type), new XAttribute("Calories", column2.Elements().First().Elements().First().Value));

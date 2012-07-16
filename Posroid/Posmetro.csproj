@@ -17,6 +17,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -113,8 +114,8 @@
     <Compile Include="Common\BindableBase.cs" />
     <Compile Include="Common\BooleanNegationConverter.cs" />
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
-    <Compile Include="MealBlockWide.xaml.cs">
-      <DependentUpon>MealBlockWide.xaml</DependentUpon>
+    <Compile Include="MealBlockTall.xaml.cs">
+      <DependentUpon>MealBlockTall.xaml</DependentUpon>
     </Compile>
     <Compile Include="CustomGridView.cs" />
     <Compile Include="CustomGroupedPage.xaml.cs">
@@ -153,7 +154,7 @@
     <Content Include="Assets\SmallLogo.png" />
     <Content Include="Assets\SplashScreen.png" />
     <Content Include="Assets\StoreLogo.png" />
-    <Page Include="MealBlockWide.xaml">
+    <Page Include="MealBlockTall.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

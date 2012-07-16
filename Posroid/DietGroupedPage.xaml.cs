@@ -28,37 +28,40 @@ namespace Posroid
         public DietGroupedPage()
         {
             this.InitializeComponent();
-            SetData();
+            SetData(false);
         }
 
-        async void SetData()
+        async void SetData(Boolean ForceDataReload)
         {
             Boolean IsNewDataNeeded = false;
 
             StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-            try
+            if (!ForceDataReload)
             {
-                StorageFile file = await localFolder.GetFileAsync("dietMenuData.xml");
                 try
                 {
-                    String str = await FileIO.ReadTextAsync(file);
-                    DietMenu dietmenu = new DietMenu(XDocument.Parse(str));
-                    if (new TimeSpan(DateTime.Now.Ticks - dietmenu.Days[0].ServedDate.Ticks).Days >= 7)
+                    StorageFile file = await localFolder.GetFileAsync("dietMenuData.xml");
+                    try
+                    {
+                        String str = await FileIO.ReadTextAsync(file);
+                        DietMenu dietmenu = new DietMenu(XDocument.Parse(str));
+                        if (new TimeSpan(DateTime.Now.Ticks - dietmenu.Days[0].ServedDate.Ticks).Days >= 7)
+                            IsNewDataNeeded = true;
+                        else
+                            this.DefaultViewModel["Groups"] = dietmenu.Days;
+                    }
+                    catch
+                    {
                         IsNewDataNeeded = true;
-                    else
-                        this.DefaultViewModel["Groups"] = dietmenu.Days;
+                    }
                 }
                 catch
                 {
                     IsNewDataNeeded = true;
                 }
             }
-            catch
-            {
-                IsNewDataNeeded = true;
-            }
 
-            //if (IsNewDataNeeded)
+            if (IsNewDataNeeded)
             {
                 String errorMessage = null;
                 try
@@ -410,21 +413,25 @@ namespace Posroid
             {
                 SidePopupColumn.Width = new GridLength(0);
                 bottomAppBar.IsOpen = false;
+                //bottomAppBar.IsSticky = false;
             }
             else
             {
-                SidePopupColumn.Width = new GridLength(430);
+                SidePopupColumn.Width = new GridLength(370);
                 if (!bottomAppBar.IsOpen)
+                {
                     bottomAppBar.IsOpen = true;
+                    //bottomAppBar.IsSticky = true;
+                }
             }
 
             foreach (object o in e.AddedItems)
             {
-                textList.Items.Insert(0, (o as IMealBlock).InternalData);
+                textList.Items.Insert(0, o);
             }
             foreach (object o in e.RemovedItems)
             {
-                textList.Items.Remove((o as IMealBlock).InternalData);
+                textList.Items.Remove(o);
             }
         }
 
@@ -432,6 +439,31 @@ namespace Posroid
         {
             itemGridView.SelectedItems.Clear();
             bottomAppBar.IsOpen = false;
+        }
+    }
+
+    public class MealBlockDataTemplateSelector : DataTemplateSelector
+    {
+        protected override DataTemplate
+            SelectTemplateCore(object item, DependencyObject container)
+        {
+            if (container != null && item != null && item is MealData)
+            {
+                var currentFrame = Window.Current.Content as Frame;
+                var currentPage = currentFrame.Content as Page;
+
+                MealData data = item as MealData;
+
+                if (data != null)
+                {
+                    if (!data.HighestCalories)
+                        return currentPage.Resources["mealBlockShortTemplate"] as DataTemplate;
+                    else
+                        return currentPage.Resources["mealBlockTallTemplate"] as DataTemplate;
+                }
+            }
+
+            return null;
         }
     }
 }

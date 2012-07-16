@@ -7,21 +7,18 @@ using System.Xml.Linq;
 
 namespace Posroid
 {
-    interface IMealBlock
-    {
-        MealData InternalData { get; }
-    }
-
     class MealData
     {
         public FoodsInfo FoodInformations { get; private set; }
         public When Mealtime { get; private set; }
         public DateTime ServedDate { get; private set; }
-        public MealData(FoodsInfo info, When mealtime, DateTime date)
+        public Boolean HighestCalories { get; private set; }
+        public MealData(FoodsInfo info, When mealtime, DateTime date, Boolean highestCalories)
         {
             FoodInformations = info;
             Mealtime = mealtime;//When enum으로 바로 받도록 하고 When->String 컨버터 만들기
             ServedDate = date;
+            HighestCalories = highestCalories;
         }
     }
 
@@ -41,11 +38,11 @@ namespace Posroid
     class Day
     {
         public Time[] Times { get; private set; }
-        public Windows.UI.Xaml.UIElement[] TotalFoodsInfo
+        public MealData[] TotalFoodsInfo
         {
             get
             {
-                List<Windows.UI.Xaml.UIElement> infolist = new List<Windows.UI.Xaml.UIElement>();
+                List<MealData> infolist = new List<MealData>();
                 foreach (Time time in Times)
                 {
                     Int32 i = 0;
@@ -64,15 +61,15 @@ namespace Posroid
                     List<FoodsInfo> foods = time.WhatFoods.ToList();
                     if (i != 0)
                         foods.RemoveAt(lastNumber);
-                    List<Windows.UI.Xaml.UIElement> smalllist = new List<Windows.UI.Xaml.UIElement>();
+                    List<MealData> smalllist = new List<MealData>();
                     foreach (FoodsInfo info in foods)
                     {
-                        smalllist.Add(new MealBlockShort(new MealData(info, time.Mealtime, ServedDate)) { Width = 130, Height = 130 });
+                        smalllist.Add(new MealData(info, time.Mealtime, ServedDate, false));
                     }
                     if (i != 0)
                     {
                         FoodsInfo highest = time.WhatFoods[lastNumber];
-                        smalllist.Insert(lastNumber, new MealBlockWide(new MealData(highest, time.Mealtime, ServedDate)) { Width = 130, Height = 270 });
+                        smalllist.Insert(lastNumber, new MealData(highest, time.Mealtime, ServedDate, true));
                     }
                     
                         //smalllist[lastNumber].Width = (d + 10) * 2 - 10;
