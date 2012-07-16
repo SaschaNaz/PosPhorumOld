@@ -1,16 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2012 for Windows 8
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Posroid", "Posroid\Posroid.csproj", "{AA25704B-59B9-4154-80DE-A9CED0713812}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Posmetro", "Posroid\Posmetro.csproj", "{AA25704B-59B9-4154-80DE-A9CED0713812}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccLocalPath0 = .
-		SccLocalPath1 = Posroid
+		SccLocalPath0 = Posroid
+		SccLocalPath1 = .
 		SccNumberOfProjects = 2
-		SccProjectName1 = Posroid
-		SccProjectUniqueName1 = Posroid\\Posroid.csproj
+		SccProjectName0 = Posroid
+		SccProjectUniqueName0 = Posroid\\Posmetro.csproj
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs33
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

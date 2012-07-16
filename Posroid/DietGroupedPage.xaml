@@ -29,10 +29,26 @@
             <Setter Property="Foreground" Value="Gray" />
             <Setter Property="FontSize" Value="18" />
         </Style>
+        
+        <local:MealBlockDataTemplateSelector x:Key="mealBlockDataTemplateSelector" />
+        <DataTemplate x:Key="mealBlockShortTemplate">
+            <Grid Background="{Binding Mealtime, Converter={StaticResource mealtimeBrushConverter}}" Width="130" Height="130">
+                <TextBlock Text="{Binding FoodInformations.Type}" FontSize="80" FontWeight="Light" Margin="69,-10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" />
+                <TextBlock Text="{Binding FoodInformations.Kilocalories, Converter={StaticResource intCaloriesConverter}}" FontSize="13" VerticalAlignment="Bottom" Margin="10,0,0,30" HorizontalAlignment="Left" />
+                <TextBlock Text="{Binding Mealtime, Converter={StaticResource mealtimeStringConverter}}" FontSize="13" VerticalAlignment="Bottom" Margin="10" HorizontalAlignment="Left" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="mealBlockTallTemplate">
+            <Grid Background="{Binding Mealtime, Converter={StaticResource mealtimeBrushConverter}}" Width="130" Height="270">
+                <TextBlock Text="{Binding FoodInformations.Type}" FontSize="80" FontWeight="Light" Margin="69,-10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" />
+                <TextBlock Text="{Binding FoodInformations.Kilocalories, Converter={StaticResource intCaloriesConverter}}" FontSize="26" VerticalAlignment="Bottom" Margin="10,0,0,30" HorizontalAlignment="Left" />
+                <TextBlock Text="{Binding Mealtime, Converter={StaticResource mealtimeStringConverter}}" FontSize="13" VerticalAlignment="Bottom" Margin="10" HorizontalAlignment="Left" />
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
 
     <Page.BottomAppBar>
-        <AppBar x:Name="bottomAppBar" Background="#FF00005D" BorderBrush="{StaticResource AppBarBorderThemeBrush}" IsSticky="True" >
+        <AppBar x:Name="bottomAppBar" Background="#FF00005D" BorderBrush="{StaticResource AppBarBorderThemeBrush}" IsSticky="True">
             <Grid>
                 <StackPanel HorizontalAlignment="Right">
                     <Button Click="ClearButtonClicked" >
@@ -75,55 +91,107 @@
             </Grid>
 
             <!-- Horizontal scrolling grid used in most view states -->
-            <local:CustomGridView
-                x:Name="itemGridView"
-                AutomationProperties.AutomationId="ItemGridView"
-                AutomationProperties.Name="Grouped Items"
-                Grid.Row="1"
-                Margin="0,-3,0,0"
-                Padding="116,0,40,46"
-                ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
-                SelectionMode="Multiple" SelectionChanged="itemGridView_SelectionChanged_1" >
+            <SemanticZoom Grid.Row="1">
+                <SemanticZoom.ZoomedInView>
+                    <local:CustomGridView
+                        x:Name="itemGridView"
+                        AutomationProperties.AutomationId="ItemGridView"
+                        AutomationProperties.Name="Grouped Items"
+                        Margin="0,-3,0,0"
+                        Padding="116,0,40,46"
+                        ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
+                        SelectionMode="Multiple" SelectionChanged="itemGridView_SelectionChanged_1"
+                        ItemTemplateSelector="{StaticResource mealBlockDataTemplateSelector}">
 
-                <GridView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </GridView.ItemsPanel>
-                <GridView.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.HeaderTemplate>
+                        <GridView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </GridView.ItemsPanel>
+                        <GridView.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="1,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Button Style="{StaticResource TextButtonStyle}" Content="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD-dayofweek}"/>
+                                            <Rectangle Grid.Column="1" Margin="10" Width="120" Fill="{Binding ServedDate, Converter={StaticResource dayBrushConverter}}" HorizontalAlignment="Left"  />
+                                        </Grid>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                                <GroupStyle.Panel>
+                                    <ItemsPanelTemplate>
+                                        <VariableSizedWrapGrid Orientation="Vertical" Margin="0,0,80,0" ItemHeight="140" ItemWidth="140"/>
+                                    </ItemsPanelTemplate>
+                                </GroupStyle.Panel>
+                            </GroupStyle>
+                        </GridView.GroupStyle>
+                        <!--<GridView.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="1,0,0,6">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Button Style="{StaticResource TextButtonStyle}" Content="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD-dayofweek}"/>
-                                    <Rectangle Grid.Column="1" Margin="10" Width="120" Fill="{Binding ServedDate, Converter={StaticResource dayBrushConverter}}" HorizontalAlignment="Left"  />
+                                <Grid>
+
                                 </Grid>
                             </DataTemplate>
-                        </GroupStyle.HeaderTemplate>
-                        <GroupStyle.Panel>
+                        </GridView.ItemTemplate>-->
+                    </local:CustomGridView>
+                </SemanticZoom.ZoomedInView>
+                <SemanticZoom.ZoomedOutView>
+                    <GridView
+                        x:Name="itemGridViewZoomedOut"
+                        Margin="0,-3,0,0"
+                        Padding="116,0,40,46"
+                        ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}">
+                        <GridView.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <VariableSizedWrapGrid Orientation="Vertical" Margin="0,0,80,0" ItemHeight="140" ItemWidth="140"/>
+                                <StackPanel Orientation="Horizontal"/>
                             </ItemsPanelTemplate>
-                        </GroupStyle.Panel>
-                    </GroupStyle>
-                </GridView.GroupStyle>
-            </local:CustomGridView>
+                        </GridView.ItemsPanel>
+                        <GridView.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="1,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Button Style="{StaticResource TextButtonStyle}" Content="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD-dayofweek}"/>
+                                            <Rectangle Grid.Column="1" Margin="10" Width="120" Fill="{Binding ServedDate, Converter={StaticResource dayBrushConverter}}" HorizontalAlignment="Left"  />
+                                        </Grid>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                                <GroupStyle.Panel>
+                                    <ItemsPanelTemplate>
+                                        <VariableSizedWrapGrid Orientation="Vertical" Margin="0,0,80,0" ItemHeight="140" ItemWidth="140"/>
+                                    </ItemsPanelTemplate>
+                                </GroupStyle.Panel>
+                            </GroupStyle>
+                        </GridView.GroupStyle>
+                        <GridView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    
+                                </Grid>
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+                    </GridView>
+                </SemanticZoom.ZoomedOutView>
+            </SemanticZoom>
 
             <!-- Vertical scrolling list only used when snapped -->
             <ListView
-            x:Name="itemListView"
-            AutomationProperties.AutomationId="ItemListView"
-            AutomationProperties.Name="Grouped Items"
-            Grid.Row="1"
-            Visibility="Collapsed"
-            Margin="0,-10,0,0"
-            Padding="10,0,0,60"
-            ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
-            ItemTemplate="{StaticResource Standard80ItemTemplate}">
+                x:Name="itemListView"
+                AutomationProperties.AutomationId="ItemListView"
+                AutomationProperties.Name="Grouped Items"
+                Grid.Row="1"
+                Visibility="Collapsed"
+                Margin="0,-10,0,0"
+                Padding="10,0,0,60"
+                ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
+                ItemTemplate="{StaticResource Standard80ItemTemplate}">
 
                 <ListView.GroupStyle>
                     <GroupStyle>
@@ -142,7 +210,7 @@
             </ListView>
         </Grid>
         
-        <ListView x:Name="textList"  Grid.Column="1" Margin="10,30,80,30"  SelectionMode="None" >
+        <ListView x:Name="textList"  Grid.Column="1" Margin="10,30,40,30" SelectionMode="None" >
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel />

@@ -16,24 +16,33 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Posroid
 {
-    partial class MealBlockShort : UserControl, IMealBlock
+    partial class MealBlockShort : UserControl
     {
         public MealBlockShort()
         {
-            this.InitializeComponent();
         }
 
         //아래 속성들은 다 사라지고 MealData 하나로 대체하겠습니다^-^
         //public SolidColorBrush BackgroundBrush { get; private set; }//MealData.Mealtime에서 바로 BackgroundBrush 컨버팅해 나올 수 있도록 컨버터 만듦
         //public String MealtimeString { get; private set; }//MealData.Mealtime으로 바인딩
         //public String TypeString { get; private set; }//MealData.FoodInformations.Type으로 바인딩
-        //public String CaloriesString { get; private set; }//MealData.FoodInformations.Kilocalories에서 컨버팅
+        //public Int32 Kilocalories
+        //{
+        //    get
+        //    {
+        //        if (InternalData != null)
+        //            return InternalData.FoodInformations.Kilocalories;
+        //        else
+        //            return 0;
+        //    }
+        //}
+        //MealData.FoodInformations.Kilocalories에서 컨버팅
         //FoodsInfo FoodInformations { get;  set; }
-        public MealData InternalData { get; private set; }
+
+        public MealData InternalData { get; set; }
 
         public MealBlockShort(MealData data)
         {
-            this.InitializeComponent();
             InternalData = data;
             //FoodInformations = info;
             //switch (mealtime)

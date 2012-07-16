@@ -16,16 +16,16 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Posroid
 {
-    partial class MealBlockWide : UserControl, IMealBlock
+    partial class MealBlockTall : UserControl
     {
-        public MealBlockWide()
+        public MealBlockTall()
         {
             this.InitializeComponent();
         }
 
-        public MealData InternalData { get; private set; }
+        public MealData InternalData { get; set; }
 
-        public MealBlockWide(MealData data)
+        public MealBlockTall(MealData data)
         {
             this.InitializeComponent();
             InternalData = data;

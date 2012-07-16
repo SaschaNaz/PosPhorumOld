@@ -14,7 +14,7 @@ namespace Posroid
         protected override void PrepareContainerForItemOverride(Windows.UI.Xaml.DependencyObject element, object item)
         {
             base.PrepareContainerForItemOverride(element, item);
-            if (item.GetType() == typeof(MealBlockWide))
+            if ((item as MealData).HighestCalories)
             {  
                 VariableSizedWrapGrid.SetRowSpan(element as UIElement, 2);
                 VariableSizedWrapGrid.SetColumnSpan(element as UIElement, 1);
