@@ -101,7 +101,8 @@
                         Padding="116,0,40,46"
                         ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
                         SelectionMode="Multiple" SelectionChanged="itemGridView_SelectionChanged_1"
-                        ItemTemplateSelector="{StaticResource mealBlockDataTemplateSelector}">
+                        ItemTemplateSelector="{StaticResource mealBlockDataTemplateSelector}"
+                        IsSwipeEnabled="True" ScrollViewer.IsHorizontalScrollChainingEnabled="False">
 
                         <GridView.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -141,39 +142,23 @@
                 <SemanticZoom.ZoomedOutView>
                     <GridView
                         x:Name="itemGridViewZoomedOut"
+                        ScrollViewer.IsHorizontalScrollChainingEnabled="False"
                         Margin="0,-3,0,0"
-                        Padding="116,0,40,46"
-                        ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}">
+                        Padding="116,0,116,40">
                         <GridView.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"/>
+                                <VariableSizedWrapGrid ItemWidth="200" ItemHeight="300" MaximumRowsOrColumns="1" VerticalChildrenAlignment="Center"  />
                             </ItemsPanelTemplate>
                         </GridView.ItemsPanel>
-                        <GridView.GroupStyle>
-                            <GroupStyle>
-                                <GroupStyle.HeaderTemplate>
-                                    <DataTemplate>
-                                        <Grid Margin="1,0,0,6">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Button Style="{StaticResource TextButtonStyle}" Content="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD-dayofweek}"/>
-                                            <Rectangle Grid.Column="1" Margin="10" Width="120" Fill="{Binding ServedDate, Converter={StaticResource dayBrushConverter}}" HorizontalAlignment="Left"  />
-                                        </Grid>
-                                    </DataTemplate>
-                                </GroupStyle.HeaderTemplate>
-                                <GroupStyle.Panel>
-                                    <ItemsPanelTemplate>
-                                        <VariableSizedWrapGrid Orientation="Vertical" Margin="0,0,80,0" ItemHeight="140" ItemWidth="140"/>
-                                    </ItemsPanelTemplate>
-                                </GroupStyle.Panel>
-                            </GroupStyle>
-                        </GridView.GroupStyle>
                         <GridView.ItemTemplate>
                             <DataTemplate>
-                                <Grid>
-                                    
+                                <Grid Margin="1,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Style="{StaticResource TextButtonStyle}" Content="{Binding Group.ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD-dayofweek}"/>
+                                    <Rectangle Grid.Column="1" Margin="10" Width="120" Fill="{Binding Group.ServedDate, Converter={StaticResource dayBrushConverter}}" HorizontalAlignment="Left"  />
                                 </Grid>
                             </DataTemplate>
                         </GridView.ItemTemplate>
