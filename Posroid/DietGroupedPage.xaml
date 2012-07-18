@@ -102,7 +102,8 @@
                         ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
                         SelectionMode="Multiple" SelectionChanged="itemGridView_SelectionChanged_1"
                         ItemTemplateSelector="{StaticResource mealBlockDataTemplateSelector}"
-                        IsSwipeEnabled="True" ScrollViewer.IsHorizontalScrollChainingEnabled="False">
+                        IsSwipeEnabled="True" ScrollViewer.IsHorizontalScrollChainingEnabled="False"
+                        IsItemClickEnabled="True" ItemClick="ItemClicked">
 
                         <GridView.ItemsPanel>
                             <ItemsPanelTemplate>
