@@ -22,7 +22,7 @@
                     <local:MealtimeStringConverter x:Key="mealtimeStringConverter" />
                     <local:IntCaloriesConverter x:Key="intCaloriesConverter" />
                     <!--<local:MealFoodConverter x:Key="mealFoodConverter" />-->
-                    <x:String x:Key="preferedLanguage">en-US</x:String>
+                    <x:String x:Key="preferedLanguage">ko</x:String>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
 

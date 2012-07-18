@@ -48,7 +48,10 @@ namespace Posroid
                         if (new TimeSpan(DateTime.Now.Ticks - dietmenu.Days[0].ServedDate.Ticks).Days >= 7)
                             IsNewDataNeeded = true;
                         else
+                        {
                             this.DefaultViewModel["Groups"] = dietmenu.Days;
+                            itemGridViewZoomedOut.ItemsSource = groupedItemsViewSource.View.CollectionGroups;
+                        }
                     }
                     catch
                     {
@@ -61,7 +64,7 @@ namespace Posroid
                 }
             }
 
-            if (IsNewDataNeeded)
+            //if (IsNewDataNeeded)
             {
                 String errorMessage = null;
                 try
@@ -69,6 +72,7 @@ namespace Posroid
                     XDocument parsedMenu = await ParseDietmenu();
                     DietMenu dietMenu = new DietMenu(parsedMenu);
                     this.DefaultViewModel["Groups"] = dietMenu.Days;
+                    itemGridViewZoomedOut.ItemsSource = groupedItemsViewSource.View.CollectionGroups;
 
                     if (new TimeSpan(DateTime.Now.Ticks - dietMenu.Days[0].ServedDate.Ticks).Days < 7)
                     {
@@ -183,26 +187,361 @@ namespace Posroid
         /// <returns></returns>
         XElement MakeFoodsElement(XElement column, XElement column2, String type)
         {
-            XElement[] foodcode = column
-                .Elements().ToArray();//p
             List<String> strfood = new List<String>();
-            foreach (XElement code in foodcode)
             {
-                String str = "";
-                foreach (XElement fontcode in code.Elements())//font 태그는 한 개만 있을 거 같죠? ㅎㅎㅎ... 내용 빈 font 태그 한번 보셔야...
+                XElement[] foodcode = column
+                    .Elements().ToArray();//p
+                foreach (XElement code in foodcode)
                 {
-                    str += fontcode.Value;
+                    String str = "";
+                    foreach (XElement fontcode in code.Elements())//font 태그는 한 개만 있을 거 같죠? ㅎㅎㅎ... 내용 빈 font 태그 한번 보셔야...
+                    {
+                        str += fontcode.Value;
+                    }
+                    if (str.Length > 0)
+                        strfood.Add(str);
                 }
-                if (str.Length > 0)
-                    strfood.Add(str);
             }
 
-            XElement xfoods = new XElement("Foods", new XAttribute("Type", type), new XAttribute("Calories", column2.Elements().First().Elements().First().Value));
+            String calint = "";
+            {
+                XElement[] foodcode = column2
+                    .Elements().ToArray();//p
+                foreach (XElement code in foodcode)
+                {
+                    foreach (XElement fontcode in code.Elements())//font 태그는 한 개만 있을 거 같죠? ㅎㅎㅎ... 내용 빈 font 태그 한번 보셔야...
+                    {
+                        calint += fontcode.Value;
+                    }
+                }
+            }
+
+            //XElement xfoods = new XElement("Foods", new XAttribute("Type", type));
+            //if (calint.Length > 0)
+            //    xfoods.Add(new XAttribute("Calories", calint));
+            //else
+            //    xfoods.Add(new XAttribute("Calories", -1));
+
+            //Char FormerLineLanguage = 'E';//K for Korean, E for English
+            //XElement xfood = new XElement("Food");
+            //foreach (String str in strfood)
+            //{
+            //    Char PresentLineLanguage;
+            //    if (IsEnglish(str))
+            //        PresentLineLanguage = 'E';
+            //    else
+            //        PresentLineLanguage = 'K';
+            //    switch (FormerLineLanguage)
+            //    {
+            //        case 'E':
+            //            switch (PresentLineLanguage)
+            //            {
+            //                case 'E':
+            //                    xfoods.Add(xfood);
+            //                    xfood = new XElement("Food");
+            //                    xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", str)));
+            //                    break;
+            //                case 'K':
+            //                    xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", str)));
+            //                    break;
+            //            }
+            //            break;
+            //        case 'K':
+            //            switch (PresentLineLanguage)
+            //            {
+            //                case 'E':
+            //                    xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", str)));
+            //                    xfoods.Add(xfood);
+            //                    xfood = new XElement("Food");
+            //                    break;
+            //                case 'K':
+            //                    xfoods.Add(xfood);
+            //                    xfood = new XElement("Food");
+            //                    xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", str)));
+            //                    break;
+            //            }
+            //            break;
+            //    }
+            //    FormerLineLanguage = PresentLineLanguage;
+            //}
+
+            //if (xfood.HasElements)
+            //    xfoods.Add(xfood);
+            //return xfoods;
+            return ParseSingleFoodData(strfood, calint, type);
+        }
+
+        /// <summary>
+        /// 기존 포스로이드 앺과의 호환성 때문에 C/D는 합쳐놓은 듯한데... 그런 거 없고 따로 표시합니다. 그러려고 만들었어요. 역시 파싱하고 있는 테이블 중 한 칸 떼어 넘기면 파싱된 결과물을 줍니다.
+        /// </summary>
+        /// <param name="column">파싱하고 있는 테이블 중 한 칸</param>
+        /// <param name="type1">어느 코너에 나오는 음식인가요1</param>
+        /// <param name="type2">어느 코너에 나오는 음식인가요2</param>
+        /// <returns></returns>
+        XElement[] MakeDualFoodsElement(XElement column, XElement column2, String type1, String type2)
+        {
+            List<String> strfood = new List<String>();
+            {
+                XElement[] foodcode = column
+                    .Elements().ToArray();//p
+                foreach (XElement code in foodcode)
+                {
+                    String str = "";
+                    foreach (XElement fontcode in code.Elements())//font 태그는 한 개만 있을 거 같죠? ㅎㅎㅎ... 내용 빈 font 태그 한번 보셔야...
+                    {
+                        str += fontcode.Value;
+                    }
+                    if (str.Length > 0)//빈 문자열은 갖다 버린다!.. 왜 엔터는 쳐서 빈 곳을 만들어요 으아아
+                        strfood.Add(str);
+                }
+            }
+
+            Boolean IsThereNoType1 = false, IsThereNoType2 = false;//C, D는 항상 함께 있을 거 같죠? ㅎㅎㅎㅎㅎㅎㅎ.... 'D코너' 한줄 추가되어 있고 C코너 사라진 꼴을 보셔야 ㅎㅎㅎ
+
+            if (strfood.Count != 0)
+            {
+                if (strfood.First().Contains(String.Format("{0}코너", type1)))//왜 StartsWith 안쓰고 Contains 쓰냐면... 어떤주엔 'D코너' 써놓고 어떤주엔 '<D코너>' 써놓거든요. 제발 <D>는 안 썼으면...
+                {
+                    IsThereNoType2 = true;
+                    strfood.Remove(strfood.First());
+                }
+                else if (strfood.First().Contains(String.Format("{0}코너", type2)))
+                {
+                    IsThereNoType1 = true;
+                    strfood.Remove(strfood.First());
+                }//첫번째 줄을 무조건 지우면 안 돼요... 홀수인 이유가 코너이름 적으려고도 있겠지만 엔터치고 괄호안에 원산지 등 추가정보 적으면서 저렇게 되는 경우가 있어서...
+            }
+
+            if (strfood.Count != 0)
+            {
+                String calint = "";
+                {
+                    XElement[] foodcode = column2
+                        .Elements().ToArray();//p
+                    foreach (XElement code in foodcode)
+                    {
+                        foreach (XElement fontcode in code.Elements())//font 태그는 한 개만 있을 거 같죠? ㅎㅎㅎ... 내용 빈 font 태그 한번 보셔야...
+                        {
+                            calint += fontcode.Value;
+                        }
+                    }
+                }
+
+                if (!IsThereNoType1 && !IsThereNoType2)
+                {
+                    
+                    //XElement xfoods1 = new XElement("Foods", new XAttribute("Type", type1));
+                    //XElement xfoods2 = new XElement("Foods", new XAttribute("Type", type2));
+                    //for (Int32 i2 = 0; i2 < strfood.Count; i2 += 2)
+                    //{
+                    //    XElement xfood1 = new XElement("Food");
+                    //    XElement xfood2 = new XElement("Food");
+                    //    String[] splitted1 = strfood[i2].Split('/');
+                    //    String[] splitted2 = strfood[i2 + 1].Split('/');
+                    //    String[] splittedcalories = column2.Elements().First().Elements().First().Value.Split('/');
+                    //    xfood1.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted1[0])));
+                    //    xfood1.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted2[0])));
+                    //    xfoods1.Add(new XAttribute("Calories", Convert.ToInt32(splittedcalories[0])));
+                    //    xfoods1.Add(xfood1);
+
+                    //    xfood2.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted1[1])));
+                    //    xfood2.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted2[1])));
+                    //    xfoods2.Add(new XAttribute("Calories", Convert.ToInt32(splittedcalories[1])));
+                    //    xfoods2.Add(xfood2);
+                    //}
+
+                    XElement xfoods1 = new XElement("Foods", new XAttribute("Type", type1));
+                    XElement xfoods2 = new XElement("Foods", new XAttribute("Type", type2));
+                    if (calint.Length > 0)
+                    {
+                        String[] splittedcalories = calint.Split('/');
+                        xfoods1.Add(new XAttribute("Calories", splittedcalories[0]));
+                        xfoods2.Add(new XAttribute("Calories", splittedcalories[1]));
+                    }
+                    else
+                    {
+                        xfoods1.Add(new XAttribute("Calories", -1));
+                        xfoods2.Add(new XAttribute("Calories", -1));
+                    }
+
+                    Char FormerLineLanguage = 'E';//K for Korean, E for English
+                    XElement xfood1 = null;
+                    XElement xfood2 = null;
+                    foreach (String str in strfood)
+                    {
+                        Nullable<BracketData> bdata = ExtractBracket(str);
+                        String processed = String.Empty;
+                        if (bdata.HasValue)
+                        {
+                            processed = bdata.Value.AfterExtracted;
+                            if (processed.Length == 0)
+                            {
+                                //마지막 코드에 괄호 추가, 더 할 일 없음. 바로 브레이크
+                                XElement langToBeFixed = xfood2.Elements().Last();
+                                XAttribute fixstr = langToBeFixed.Attribute("Value");
+                                fixstr.Remove();
+                                langToBeFixed.Add(new XAttribute("Value", (String)fixstr + bdata.Value.ExtractedString));
+                                break;
+                            }
+                        }
+
+                        //문자열 처리부분
+                        String[] splitted = str.Split('/');
+                        Char PresentLineLanguage;
+                        if (IsEnglish(str))
+                            PresentLineLanguage = 'E';
+                        else
+                            PresentLineLanguage = 'K';
+                        switch (FormerLineLanguage)
+                        {
+                            case 'E':
+                                switch (PresentLineLanguage)
+                                {
+                                    case 'E':
+                                        {
+                                            xfoods1.Add(xfood1);
+                                            xfoods2.Add(xfood2);
+                                            xfood1 = new XElement("Food");
+                                            xfood2 = new XElement("Food");
+                                            xfood1.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted[0])));
+                                            xfood2.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted[1])));
+                                            break;
+                                        }
+                                    case 'K':
+                                        {
+                                            xfoods1.Add(xfood1);
+                                            xfoods2.Add(xfood2);
+                                            xfood1 = new XElement("Food");
+                                            xfood2 = new XElement("Food");
+                                            xfood1.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted[0])));
+                                            xfood2.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted[1])));
+                                            break;
+                                        }
+                                }
+                                break;
+                            case 'K':
+                                switch (PresentLineLanguage)
+                                {
+                                    case 'E':
+                                        {
+                                            xfood1.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted[0])));
+                                            xfood2.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted[1])));
+                                            //xfoods.Add(xfood);
+                                            //xfood = new XElement("Food");
+                                            break;
+                                        }
+                                    case 'K':
+                                        {
+                                            xfoods1.Add(xfood1);
+                                            xfoods2.Add(xfood2);
+                                            xfood1 = new XElement("Food");
+                                            xfood2 = new XElement("Food");
+                                            xfood1.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted[0])));
+                                            xfood2.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted[1])));
+                                            break;
+                                        }
+                                }
+                                break;
+                        }
+                        FormerLineLanguage = PresentLineLanguage;
+
+                        if (processed.Length > 0)
+                        {
+                            //후처리부
+                            Int32 splitpoint = str.IndexOf('/');
+                            XElement langToBeFixed;
+                            if (splitpoint < bdata.Value.StartPoint)
+                            {
+                                langToBeFixed = xfood1.Elements().Last();
+                                XAttribute fixstr = langToBeFixed.Attribute("Value");
+                                fixstr.Remove();
+                                langToBeFixed.Add(new XAttribute("Value", (String)fixstr + bdata.Value.ExtractedString));
+                            }
+                            else
+                            {
+                                langToBeFixed = xfood2.Elements().Last();
+                                XAttribute fixstr = langToBeFixed.Attribute("Value");
+                                fixstr.Remove();
+                                langToBeFixed.Add(new XAttribute("Value", (String)fixstr + bdata.Value.ExtractedString));
+                            }
+                        }
+                    }
+
+                    //xfoods1.Elements().First().Remove();
+                    //xfoods2.Elements().First().Remove();
+                    if (xfood1.HasElements)
+                        xfoods1.Add(xfood1);
+                    if (xfood2.HasElements)
+                        xfoods2.Add(xfood2);
+
+                    return new XElement[] { xfoods1, xfoods2 };
+                }
+                else if (IsThereNoType1)
+                {
+                    //XElement xfoods = new XElement("Foods", new XAttribute("Type", type2));
+                    //if (calint.Length > 0)
+                    //    xfoods.Add(new XAttribute("Calories", calint));
+                    //else
+                    //    xfoods.Add(new XAttribute("Calories", -1));
+                    //for (Int32 i2 = 0; i2 < strfood.Count; i2 += 2)
+                    //{
+                    //    XElement xfood = new XElement("Food");
+                    //    xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", strfood[i2])));
+                    //    xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", strfood[i2 + 1])));
+                    //    xfoods.Add(xfood);
+                    //}
+                    return new XElement[] { ParseSingleFoodData(strfood, calint, type2) };
+                }
+                else
+                {
+                    //XElement xfoods = new XElement("Foods", new XAttribute("Type", type1));
+                    //if (calint.Length > 0)
+                    //    xfoods.Add(new XAttribute("Calories", calint));
+                    //else
+                    //    xfoods.Add(new XAttribute("Calories", -1));
+                    //for (Int32 i2 = 0; i2 < strfood.Count; i2 += 2)
+                    //{
+                    //    XElement xfood = new XElement("Food");
+                    //    xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", strfood[i2])));
+                    //    xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", strfood[i2 + 1])));
+                    //    xfoods.Add(xfood);
+                    //}
+                    return new XElement[] { ParseSingleFoodData(strfood, calint, type1) };
+                }
+            }
+            else
+                return new XElement[0];
+        }
+
+        XElement ParseSingleFoodData(List<String> strfood, String calstr, String type)
+        {
+            XElement xfoods = new XElement("Foods", new XAttribute("Type", type));
+            if (calstr.Length > 0)
+                xfoods.Add(new XAttribute("Calories", calstr));
+            else
+                xfoods.Add(new XAttribute("Calories", -1));
 
             Char FormerLineLanguage = 'E';//K for Korean, E for English
-            XElement xfood = new XElement("Food");
+            XElement xfood = null;//new XElement("Food");
             foreach (String str in strfood)
             {
+                Nullable<BracketData> bdata = ExtractBracket(str);
+                String processed = String.Empty;
+                if (bdata.HasValue)
+                {
+                    processed = bdata.Value.AfterExtracted;
+                    if (processed.Length == 0)
+                    {
+                        //마지막 코드에 괄호 추가, 더 할 일 없음. 바로 브레이크
+                        XElement langToBeFixed = xfood.Elements().Last();
+                        XAttribute fixstr = langToBeFixed.Attribute("Value");
+                        fixstr.Remove();
+                        langToBeFixed.Add(new XAttribute("Value", (String)fixstr + bdata.Value.ExtractedString));
+                        break;
+                    }
+                }
+
+
                 Char PresentLineLanguage;
                 if (IsEnglish(str))
                     PresentLineLanguage = 'E';
@@ -219,6 +558,8 @@ namespace Posroid
                                 xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", str)));
                                 break;
                             case 'K':
+                                xfoods.Add(xfood);
+                                xfood = new XElement("Food");
                                 xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", str)));
                                 break;
                         }
@@ -228,8 +569,6 @@ namespace Posroid
                         {
                             case 'E':
                                 xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", str)));
-                                xfoods.Add(xfood);
-                                xfood = new XElement("Food");
                                 break;
                             case 'K':
                                 xfoods.Add(xfood);
@@ -240,59 +579,54 @@ namespace Posroid
                         break;
                 }
                 FormerLineLanguage = PresentLineLanguage;
+
+                if (processed.Length > 0)
+                {
+                    XElement langToBeFixed = xfood.Elements().Last();
+                    XAttribute fixstr = langToBeFixed.Attribute("Value");
+                    fixstr.Remove();
+                    langToBeFixed.Add(new XAttribute("Value", (String)fixstr + bdata.Value.ExtractedString));
+                }
             }
 
+            //xfoods.Elements().First().Remove();
             if (xfood.HasElements)
                 xfoods.Add(xfood);
-            //Boolean IsFormerLineRegular = true;
-            //for (Int32 i2 = 0; i2 < strfood.Count; i2 += 2)
-            //{
-            //    XElement xfood = new XElement("Food");
 
-            //    if (IsFormerLineRegular)
-            //    {
-            //        if (!IsEnglish(strfood[i2]))//이번 라인은 한국어, 한국어입니다. This line is Korean, Korean line. 今回のラインは韓国語、韓国語です。
-            //        {
-            //            xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", strfood[i2])));
-            //            if (IsEnglish(strfood[i2 + 1]))
-            //            {
-            //                xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", strfood[i2 + 1])));
-            //                IsFormerLineRegular = true;
-            //            }
-            //            else
-            //            {
-            //                IsFormerLineRegular = false;
-            //                i2--;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", strfood[i2])));
-            //            IsFormerLineRegular = false;
-            //            i2--;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", strfood[i2])));
-            //        if (IsEnglish(strfood[i2 + 1]))
-            //        {
-            //            xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", strfood[i2 + 1])));
-            //            IsFormerLineRegular = true;
-            //        }
-            //        else
-            //        {
-            //            IsFormerLineRegular = false;
-            //            i2--;
-            //        }
-            //    }
-
-            //    xfoods.Add(xfood);
-            //}
             return xfoods;
         }
 
-        public Boolean IsEnglish(String str)
+        struct BracketData
+        {
+            public Int32 StartPoint;
+            public String AfterExtracted;
+            public String ExtractedString;
+        }
+
+        /// <summary>
+        /// String 안에 괄호가 있는지 검사하여 있으면 그에 대한 정보가 반환되며, 없을 경우 null이 반환됩니다.
+        /// </summary>
+        /// <param name="input">검사할 String</param>
+        /// <returns>괄호의 시작점, 괄호를 포함해 괄호 안의 문자열, 또 그것을 제외한 문자열을 반환합니다.</returns>
+        Nullable<BracketData> ExtractBracket(String input)
+        {
+            Int32 bracketStartPoint = input.IndexOf('(');
+            if (bracketStartPoint != -1)
+            {
+                Int32 bracketEndPoint = input.LastIndexOf(')');
+                Int32 Length = bracketEndPoint - bracketStartPoint + 1;
+                if (Length > 0)
+                    return new BracketData()
+                    {
+                        StartPoint = bracketStartPoint,
+                        AfterExtracted = input.Remove(bracketStartPoint, Length),
+                        ExtractedString = input.Substring(bracketStartPoint, Length)
+                    };
+            }
+            return null;
+        }
+
+        Boolean IsEnglish(String str)
         {
             foreach (Char c in str)
             {
@@ -303,94 +637,6 @@ namespace Posroid
                     return false;
             }
             return true;
-        }
-
-
-        /// <summary>
-        /// 기존 포스로이드 앺과의 호환성 때문에 C/D는 합쳐놓은 듯한데... 그런 거 없고 따로 표시합니다. 그러려고 만들었어요. 역시 파싱하고 있는 테이블 중 한 칸 떼어 넘기면 파싱된 결과물을 줍니다.
-        /// </summary>
-        /// <param name="column">파싱하고 있는 테이블 중 한 칸</param>
-        /// <param name="type1">어느 코너에 나오는 음식인가요1</param>
-        /// <param name="type2">어느 코너에 나오는 음식인가요2</param>
-        /// <returns></returns>
-        XElement[] MakeDualFoodsElement(XElement column, XElement column2, String type1, String type2)
-        {
-            XElement[] foodcode = column
-                .Elements().ToArray();//p
-            List<String> strfood = new List<String>();
-            foreach (XElement code in foodcode)
-            {
-                String str = "";
-                foreach (XElement fontcode in code.Elements())//font 태그는 한 개만 있을 거 같죠? ㅎㅎㅎ... 내용 빈 font 태그 한번 보셔야...
-                {
-                    str += fontcode.Value;
-                }
-                if (str.Length > 0)//빈 문자열은 갖다 버린다!.. 왜 엔터는 쳐서 빈 곳을 만들어요 으아아
-                    strfood.Add(str);
-            }
-
-            Boolean IsThereNoType1 = false, IsThereNoType2 = false;//C, D는 항상 함께 있을 거 같죠? ㅎㅎㅎㅎㅎㅎㅎ.... 'D코너' 한줄 추가되어 있고 C코너 사라진 꼴을 보셔야 ㅎㅎㅎ
-            if (strfood.Count % 2 == 1)
-            {
-                if (strfood.First().Contains(String.Format("{0}코너", type1)))//왜 StartsWith 안쓰고 Contains 쓰냐면... 어떤주엔 'D코너' 써놓고 어떤주엔 '<D코너>' 써놓거든요. 제발 <D>는 안 썼으면...
-                    IsThereNoType2 = true;
-                else if (strfood.First().Contains(String.Format("{0}코너", type2)))
-                    IsThereNoType1 = true;
-                strfood.Remove(strfood.First());
-            }
-            if (strfood.Count != 0)
-            {
-                if (!IsThereNoType1 && !IsThereNoType2)
-                {
-                    XElement xfoods1 = new XElement("Foods", new XAttribute("Type", type1));
-                    XElement xfoods2 = new XElement("Foods", new XAttribute("Type", type2));
-                    for (Int32 i2 = 0; i2 < strfood.Count; i2 += 2)
-                    {
-                        XElement xfood1 = new XElement("Food");
-                        XElement xfood2 = new XElement("Food");
-                        String[] splitted1 = strfood[i2].Split('/');
-                        String[] splitted2 = strfood[i2 + 1].Split('/');
-                        String[] splittedcalories = column2.Elements().First().Elements().First().Value.Split('/');
-                        xfood1.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted1[0])));
-                        xfood1.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted2[0])));
-                        xfoods1.Add(new XAttribute("Calories", Convert.ToInt32(splittedcalories[0])));
-                        xfoods1.Add(xfood1);
-
-                        xfood2.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted1[1])));
-                        xfood2.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted2[1])));
-                        xfoods2.Add(new XAttribute("Calories", Convert.ToInt32(splittedcalories[1])));
-                        xfoods2.Add(xfood2);
-                    }
-
-                    return new XElement[] { xfoods1, xfoods2 };
-                }
-                else if (IsThereNoType1)
-                {
-                    XElement xfoods = new XElement("Foods", new XAttribute("Type", type2), new XAttribute("Calories", column2.Elements().First().Elements().First().Value));
-                    for (Int32 i2 = 0; i2 < strfood.Count; i2 += 2)
-                    {
-                        XElement xfood = new XElement("Food");
-                        xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", strfood[i2])));
-                        xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", strfood[i2 + 1])));
-                        xfoods.Add(xfood);
-                    }
-                    return new XElement[] { xfoods };
-                }
-                else
-                {
-                    XElement xfoods = new XElement("Foods", new XAttribute("Type", type1), new XAttribute("Calories", column2.Elements().First().Elements().First().Value));
-                    for (Int32 i2 = 0; i2 < strfood.Count; i2 += 2)
-                    {
-                        XElement xfood = new XElement("Food");
-                        xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", strfood[i2])));
-                        xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", strfood[i2 + 1])));
-                        xfoods.Add(xfood);
-                    }
-                    return new XElement[] { xfoods };
-                }
-            }
-            else
-                return new XElement[0];
         }
 
         /// <summary>
@@ -439,6 +685,11 @@ namespace Posroid
         {
             itemGridView.SelectedItems.Clear();
             bottomAppBar.IsOpen = false;
+        }
+
+        private void ItemClicked(object sender, ItemClickEventArgs e)
+        {
+            (sender as GridView).SelectedItem = e.ClickedItem;
         }
     }
 

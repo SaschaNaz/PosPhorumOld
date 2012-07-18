@@ -286,8 +286,10 @@ namespace Posroid
                 throw new ArgumentException("Value must be of type Int32.", "value");
 
             Int32 cal = (Int32)value;
-
-            return String.Format("{0}kcal", cal);
+            if (cal != -1)
+                return String.Format("{0}kcal", cal);
+            else
+                return "(Unknown)";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string culture)
