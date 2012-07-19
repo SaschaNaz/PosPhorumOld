@@ -178,23 +178,40 @@
                 Visibility="Collapsed"
                 Margin="0,-10,0,0"
                 Padding="10,0,0,60"
-                ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
-                ItemTemplate="{StaticResource Standard80ItemTemplate}">
+                ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel />
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
 
                 <ListView.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.HeaderTemplate>
                             <DataTemplate>
                                 <Grid Margin="7,7,0,0">
-                                    <Button
-                                    AutomationProperties.Name="Group Title"
-                                    Content="{Binding Title}"
-                                    Style="{StaticResource TextButtonStyle}"/>
+                                    <Rectangle Margin="5" Width="22" Height="22" Fill="{Binding ServedDate, Converter={StaticResource dayBrushConverter}}" HorizontalAlignment="Left"  />
+                                    <Button Margin="35,2,0,0" Style="{StaticResource TextButtonStyle}" Content="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD/dayofweek}" Click="NavigateClicked"/>
                                 </Grid>
                             </DataTemplate>
                         </GroupStyle.HeaderTemplate>
                     </GroupStyle>
                 </ListView.GroupStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Height="60">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="54"/>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Rectangle Margin="12,12,6,12" Fill="{Binding Mealtime, Converter={StaticResource mealtimeBrushConverter}}" />
+                            <TextBlock Grid.Column="1" Margin="3,-7,3,0" Text="{Binding FoodInformations.Type}" FontSize="50" FontWeight="Light" VerticalAlignment="Top" HorizontalAlignment="Left" />
+                            <TextBlock Grid.Column="2" Text="{Binding FoodInformations.Kilocalories, Converter={StaticResource intCaloriesConverter}}" FontSize="18" VerticalAlignment="Bottom" Margin="10,0,0,30" HorizontalAlignment="Left" />
+                            <TextBlock Grid.Column="2" Text="{Binding Mealtime, Converter={StaticResource mealtimeStringConverter}}" FontSize="18" VerticalAlignment="Bottom" Margin="10" HorizontalAlignment="Left" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
             </ListView>
         </Grid>
         
@@ -241,10 +258,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
-                                <StackPanel Orientation="Horizontal" Margin="13,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" >
-                                    <TextBlock Text="{Binding Kilocalories}" Style="{StaticResource CaloriesTextStyle}" />
-                                    <TextBlock Text="kcal" Style="{StaticResource CaloriesTextStyle}" />
-                                </StackPanel>
+                                <TextBlock Margin="13,10,0,0" Text="{Binding Kilocalories, Converter={StaticResource intCaloriesConverter}}" Style="{StaticResource CaloriesTextStyle}" />
                                 <ItemsControl ItemsSource="{Binding Foods}" Grid.Row="1"  Margin="13,0,0,20" >
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
