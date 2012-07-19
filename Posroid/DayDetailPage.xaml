@@ -12,16 +12,126 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-
         <!-- TODO: Delete this line if the key AppName is declared in App.xaml -->
         <x:String x:Key="AppName">(Date) Details</x:String>
-        <Style TargetType="TextBlock" BasedOn="{StaticResource CaptionTextStyle}" >
+        <CollectionViewSource
+            x:Name="groupedItemsViewSource"
+            Source="{Binding MealTimes}"
+            IsSourceGrouped="true"
+            ItemsPath="WhatFoods"/>
+        
+        <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="Black" />
         </Style>
         <Style x:Key="CaloriesTextStyle" TargetType="TextBlock" BasedOn="{StaticResource CaptionTextStyle}" >
             <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="FontSize" Value="18" />
         </Style>
-        
+        <Style x:Key="LightBackButtonStyle" TargetType="Button">
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Width" Value="48"/>
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="Margin" Value="36,0,36,36"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="FontSize" Value="56"/>
+            <Setter Property="AutomationProperties.AutomationId" Value="BackButton"/>
+            <Setter Property="AutomationProperties.Name" Value="Back"/>
+            <Setter Property="AutomationProperties.ItemType" Value="Navigation Button"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid x:Name="RootGrid">
+
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BackgroundGlyph" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#3D000000"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="NormalGlyph" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BackgroundGlyph" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <DoubleAnimation
+        										Storyboard.TargetName="ArrowGlyph"
+        										Storyboard.TargetProperty="Opacity"
+        										To="1"
+        										Duration="0"/>
+                                            <DoubleAnimation
+        										Storyboard.TargetName="NormalGlyph"
+        										Storyboard.TargetProperty="Opacity"
+        										To="0"
+        										Duration="0"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="FocusStates">
+                                    <VisualState x:Name="Focused">
+                                        <Storyboard>
+                                            <DoubleAnimation
+        										Storyboard.TargetName="FocusVisualWhite"
+        										Storyboard.TargetProperty="Opacity"
+        										To="1"
+        										Duration="0"/>
+                                            <DoubleAnimation
+        										Storyboard.TargetName="FocusVisualBlack"
+        										Storyboard.TargetProperty="Opacity"
+        										To="1"
+        										Duration="0"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Unfocused" />
+                                    <VisualState x:Name="PointerFocused" />
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Grid Margin="-1,-16,0,0">
+                                <TextBlock x:Name="BackgroundGlyph" Text="&#xE0A8;" Foreground="Transparent"/>
+                                <TextBlock x:Name="NormalGlyph" Text="{StaticResource BackButtonGlyph}" Foreground="Black"/>
+                                <TextBlock x:Name="ArrowGlyph" Text="&#xE0A6;" Foreground="White" Opacity="0"/>
+                            </Grid>
+                            <Rectangle
+        						x:Name="FocusVisualWhite"
+        						IsHitTestVisible="False"
+        						Stroke="White"
+        						StrokeEndLineCap="Square"
+        						StrokeDashArray="1,1"
+        						Opacity="0"
+        						StrokeDashOffset="1.5"/>
+                            <Rectangle
+        						x:Name="FocusVisualBlack"
+        						IsHitTestVisible="False"
+        						Stroke="Black"
+        						StrokeEndLineCap="Square"
+        						StrokeDashArray="1,1"
+        						Opacity="0"
+        						StrokeDashOffset="0.5"/>
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="LightBaselineTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BaselineTextStyle}">
+            <Setter Property="Foreground" Value="#DE000000" />
+        </Style>
+
     </Page.Resources>
 
     <!--
@@ -41,136 +151,160 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="MinWidth" Value="0"/>
-                        <Setter Property="Width" Value="48"/>
-                        <Setter Property="Height" Value="48"/>
-                        <Setter Property="Margin" Value="36,0,36,36"/>
-                        <Setter Property="VerticalAlignment" Value="Bottom"/>
-                        <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
-                        <Setter Property="FontWeight" Value="Normal"/>
-                        <Setter Property="FontSize" Value="56"/>
-                        <Setter Property="AutomationProperties.AutomationId" Value="BackButton"/>
-                        <Setter Property="AutomationProperties.Name" Value="Back"/>
-                        <Setter Property="AutomationProperties.ItemType" Value="Navigation Button"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <Grid x:Name="RootGrid">
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroup x:Name="CommonStates">
-                                                <VisualState x:Name="Normal"/>
-                                                <VisualState x:Name="PointerOver">
-                                                    <Storyboard>
-                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="BackgroundGlyph">
-                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource BackButtonPointerOverBackgroundThemeBrush}"/>
-                                                        </ObjectAnimationUsingKeyFrames>
-                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="NormalGlyph">
-                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource BackButtonPointerOverForegroundThemeBrush}"/>
-                                                        </ObjectAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="Pressed">
-                                                    <Storyboard>
-                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="BackgroundGlyph">
-                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource BackButtonForegroundThemeBrush}"/>
-                                                        </ObjectAnimationUsingKeyFrames>
-                                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="ArrowGlyph"/>
-                                                        <DoubleAnimation Duration="0" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="NormalGlyph"/>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="Disabled">
-                                                    <Storyboard>
-                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility" Storyboard.TargetName="RootGrid">
-                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
-                                                        </ObjectAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                            <VisualStateGroup x:Name="FocusStates">
-                                                <VisualState x:Name="Focused">
-                                                    <Storyboard>
-                                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="FocusVisualWhite"/>
-                                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="FocusVisualBlack"/>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="Unfocused"/>
-                                                <VisualState x:Name="PointerFocused"/>
-                                            </VisualStateGroup>
-                                        </VisualStateManager.VisualStateGroups>
-                                        <Grid Margin="-1,-16,0,0">
-                                            <TextBlock x:Name="BackgroundGlyph" Foreground="{StaticResource BackButtonBackgroundThemeBrush}" Text="&#xE0A8;"/>
-                                            <TextBlock x:Name="NormalGlyph" Foreground="Black" Text="{StaticResource BackButtonGlyph}"/>
-                                            <TextBlock x:Name="ArrowGlyph" Foreground="{StaticResource BackButtonPressedForegroundThemeBrush}" Opacity="0" Text="&#xE0A6;"/>
-                                        </Grid>
-                                        <Rectangle x:Name="FocusVisualWhite" IsHitTestVisible="False" Opacity="0" StrokeDashOffset="1.5" StrokeEndLineCap="Square" Stroke="{StaticResource FocusVisualWhiteStrokeThemeBrush}" StrokeDashArray="1,1"/>
-                                        <Rectangle x:Name="FocusVisualBlack" IsHitTestVisible="False" Opacity="0" StrokeDashOffset="0.5" StrokeEndLineCap="Square" Stroke="{StaticResource FocusVisualBlackStrokeThemeBrush}" StrokeDashArray="1,1"/>
-                                    </Grid>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Button.Style>
-            </Button>
+            <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource LightBackButtonStyle}" />
             <TextBlock x:Name="pageTitle" Grid.Column="1" Text="{StaticResource AppName}" Style="{StaticResource PageHeaderTextStyle}" Foreground="#DE000000"/>
         </Grid>
-        
-        <Grid Grid.Row="1">
-            <StackPanel Orientation="Horizontal" Margin="10,0,0,25">
-                <TextBlock Text="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD}" Style="{StaticResource HeaderTextStyle}" VerticalAlignment="Bottom"/>
-                <TextBlock Text="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=dayofweek}" Style="{StaticResource SubheaderTextStyle}" VerticalAlignment="Bottom" />
+        <Grid Grid.Row="1" >
+            <GridView
+                x:Name="itemGridView"
+                AutomationProperties.AutomationId="ItemGridView"
+                AutomationProperties.Name="Grouped Items"
+                Margin="0,-3,0,0"
+                Padding="116,0,40,46"
+                ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
+                SelectionMode="None" >
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+                <GridView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid Margin="1,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Mealtime, Converter={StaticResource mealtimeStringConverter}}" FontSize="50" Foreground="Gray" FontWeight="Light" />
+                                </Grid>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                        <GroupStyle.Panel>
+                            <ItemsPanelTemplate>
+                                <VariableSizedWrapGrid Orientation="Vertical" Margin="0,0,80,0" ItemWidth="200" />
+                            </ItemsPanelTemplate>
+                        </GroupStyle.Panel>
+                    </GroupStyle>
+                </GridView.GroupStyle>
+                <GridView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Width="190">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Type}" FontSize="70" Foreground="Gray" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <StackPanel Orientation="Horizontal" Margin="13,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" >
+                                    <TextBlock Text="{Binding Kilocalories}" Style="{StaticResource CaloriesTextStyle}" />
+                                    <TextBlock Text="kcal" Style="{StaticResource CaloriesTextStyle}" />
+                                </StackPanel>
+                                <ItemsControl ItemsSource="{Binding Foods}" Grid.Row="1"  Margin="13,0,0,20" >
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="- " Foreground="Black" FontSize="18" />
+                                                <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding langstr, Converter={StaticResource languageConverter}, ConverterParameter={StaticResource preferedLanguage}}" FontSize="18" TextWrapping="Wrap" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <!--<local:CustomGridView
+                        x:Name="itemGridView"
+                        AutomationProperties.AutomationId="ItemGridView"
+                        AutomationProperties.Name="Grouped Items"
+                        Margin="0,-3,0,0"
+                        Padding="116,0,40,46"
+                        ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
+                        SelectionMode="Multiple" SelectionChanged="itemGridView_SelectionChanged_1"
+                        ItemTemplateSelector="{StaticResource mealBlockDataTemplateSelector}"
+                        IsSwipeEnabled="True" ScrollViewer.IsHorizontalScrollChainingEnabled="False"
+                        IsItemClickEnabled="True" ItemClick="ItemClicked">
+
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+                <GridView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid Margin="1,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Style="{StaticResource TextButtonStyle}" Content="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD-dayofweek}" Click="NavigateClicked"/>
+                                    <Rectangle Grid.Column="1" Margin="10" Width="120" Fill="{Binding ServedDate, Converter={StaticResource dayBrushConverter}}" HorizontalAlignment="Left"  />
+                                </Grid>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                        <GroupStyle.Panel>
+                            <ItemsPanelTemplate>
+                                <VariableSizedWrapGrid Orientation="Vertical" Margin="0,0,80,0" ItemHeight="140" ItemWidth="140"/>
+                            </ItemsPanelTemplate>
+                        </GroupStyle.Panel>
+                    </GroupStyle>
+                </GridView.GroupStyle>
+                <GridView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+
+                                </Grid>
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+            </local:CustomGridView>-->
+            <!--<StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Mealtime}" >
+                    <TextBlock.Style>
+                        <Style BasedOn="{StaticResource BaselineTextStyle}" TargetType="TextBlock">
+                            <Setter Property="FontSize" Value="35"/>
+                            <Setter Property="FontWeight" Value="Light"/>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
             </StackPanel>
 
-            <ItemsControl Grid.Row="1" ItemsSource="{Binding Times}" >
+            <ItemsControl ItemsSource="{Binding WhatFoods}" Grid.Row="1" >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid Margin="30,20,0,20">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="25" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Mealtime}" >
-                                    <TextBlock.Style>
-                                        <Style BasedOn="{StaticResource BaselineTextStyle}" TargetType="TextBlock">
-                                            <Setter Property="FontSize" Value="35"/>
-                                            <Setter Property="FontWeight" Value="Light"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Type}" FontSize="70" Foreground="#FFEEEEEE" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,60,0,0">
+                                <TextBlock Text="{Binding Kilocalories}" Style="{StaticResource CaloriesTextStyle}" />
+                                <TextBlock Text="kcal" Style="{StaticResource CaloriesTextStyle}" />
                             </StackPanel>
-
-                            <ItemsControl ItemsSource="{Binding WhatFoods}" Grid.Row="1" >
+                            <ItemsControl ItemsSource="{Binding Foods}" Grid.Column="1" Margin="13" >
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="50" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding Type}" FontSize="70" Foreground="#FFEEEEEE" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,60,0,0">
-                                                <TextBlock Text="{Binding Kilocalories}" Style="{StaticResource CaloriesTextStyle}" />
-                                                <TextBlock Text="kcal" Style="{StaticResource CaloriesTextStyle}" />
-                                            </StackPanel>
-                                            <ItemsControl ItemsSource="{Binding Foods}" Grid.Column="1" Margin="13" >
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <TextBlock Text="{Binding langstr, Converter={StaticResource languageConverter}, ConverterParameter={StaticResource preferedLanguage}}" />
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </Grid>
+                                        <TextBlock Text="{Binding langstr, Converter={StaticResource languageConverter}, ConverterParameter={StaticResource preferedLanguage}}" />
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            </ItemsControl>-->
         </Grid>
 
         <VisualStateManager.VisualStateGroups>

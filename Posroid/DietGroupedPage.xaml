@@ -159,7 +159,8 @@
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <Button Style="{StaticResource TextButtonStyle}" Content="{Binding Group.ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD-dayofweek}"/>
+                                    <TextBlock Margin="3,-7,3,10" Text="{Binding Group.ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD-dayofweek}" Style="{StaticResource SubheaderTextStyle}"/>
+                                    <!--<Button Style="{StaticResource TextButtonStyle}" Content="{Binding Group.ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD-dayofweek}"/>-->
                                     <Rectangle Grid.Column="1" Margin="10" Width="120" Fill="{Binding Group.ServedDate, Converter={StaticResource dayBrushConverter}}" HorizontalAlignment="Left"  />
                                 </Grid>
                             </DataTemplate>
