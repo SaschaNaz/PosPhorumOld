@@ -28,10 +28,9 @@ namespace Posroid
         public DietGroupedPage()
         {
             this.InitializeComponent();
-            SetData(false);
         }
 
-        async void SetData(Boolean ForceDataReload)
+        async Task SetData(Boolean ForceDataReload, Double horizontalOffset)
         {
             Boolean IsNewDataNeeded = false;
 
@@ -63,8 +62,10 @@ namespace Posroid
                     IsNewDataNeeded = true;
                 }
             }
+            else
+                IsNewDataNeeded = true;
 
-            //if (IsNewDataNeeded)
+            if (IsNewDataNeeded)
             {
                 String errorMessage = null;
                 try
@@ -93,6 +94,15 @@ namespace Posroid
                     await new Windows.UI.Popups.MessageDialog(errorMessage).ShowAsync();
                 //localSettings.Values["dietMenuData"] = dietMenu.Stringify();
             }
+
+            RoutedEventHandler handler = null;
+            handler = delegate
+             {
+                 if (horizontalOffset > 0)
+                     GetVisualChild<ScrollViewer>(itemGridView).ScrollToHorizontalOffset(horizontalOffset);
+                 itemGridView.Loaded -= handler;
+             };
+            itemGridView.Loaded += handler;
         }
 
         async Task<XDocument> ParseDietmenu()
@@ -215,59 +225,6 @@ namespace Posroid
                     }
                 }
             }
-
-            //XElement xfoods = new XElement("Foods", new XAttribute("Type", type));
-            //if (calint.Length > 0)
-            //    xfoods.Add(new XAttribute("Calories", calint));
-            //else
-            //    xfoods.Add(new XAttribute("Calories", -1));
-
-            //Char FormerLineLanguage = 'E';//K for Korean, E for English
-            //XElement xfood = new XElement("Food");
-            //foreach (String str in strfood)
-            //{
-            //    Char PresentLineLanguage;
-            //    if (IsEnglish(str))
-            //        PresentLineLanguage = 'E';
-            //    else
-            //        PresentLineLanguage = 'K';
-            //    switch (FormerLineLanguage)
-            //    {
-            //        case 'E':
-            //            switch (PresentLineLanguage)
-            //            {
-            //                case 'E':
-            //                    xfoods.Add(xfood);
-            //                    xfood = new XElement("Food");
-            //                    xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", str)));
-            //                    break;
-            //                case 'K':
-            //                    xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", str)));
-            //                    break;
-            //            }
-            //            break;
-            //        case 'K':
-            //            switch (PresentLineLanguage)
-            //            {
-            //                case 'E':
-            //                    xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", str)));
-            //                    xfoods.Add(xfood);
-            //                    xfood = new XElement("Food");
-            //                    break;
-            //                case 'K':
-            //                    xfoods.Add(xfood);
-            //                    xfood = new XElement("Food");
-            //                    xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", str)));
-            //                    break;
-            //            }
-            //            break;
-            //    }
-            //    FormerLineLanguage = PresentLineLanguage;
-            //}
-
-            //if (xfood.HasElements)
-            //    xfoods.Add(xfood);
-            //return xfoods;
             return ParseSingleFoodData(strfood, calint, type);
         }
 
@@ -329,27 +286,6 @@ namespace Posroid
 
                 if (!IsThereNoType1 && !IsThereNoType2)
                 {
-                    
-                    //XElement xfoods1 = new XElement("Foods", new XAttribute("Type", type1));
-                    //XElement xfoods2 = new XElement("Foods", new XAttribute("Type", type2));
-                    //for (Int32 i2 = 0; i2 < strfood.Count; i2 += 2)
-                    //{
-                    //    XElement xfood1 = new XElement("Food");
-                    //    XElement xfood2 = new XElement("Food");
-                    //    String[] splitted1 = strfood[i2].Split('/');
-                    //    String[] splitted2 = strfood[i2 + 1].Split('/');
-                    //    String[] splittedcalories = column2.Elements().First().Elements().First().Value.Split('/');
-                    //    xfood1.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted1[0])));
-                    //    xfood1.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted2[0])));
-                    //    xfoods1.Add(new XAttribute("Calories", Convert.ToInt32(splittedcalories[0])));
-                    //    xfoods1.Add(xfood1);
-
-                    //    xfood2.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted1[1])));
-                    //    xfood2.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted2[1])));
-                    //    xfoods2.Add(new XAttribute("Calories", Convert.ToInt32(splittedcalories[1])));
-                    //    xfoods2.Add(xfood2);
-                    //}
-
                     XElement xfoods1 = new XElement("Foods", new XAttribute("Type", type1));
                     XElement xfoods2 = new XElement("Foods", new XAttribute("Type", type2));
                     if (calint.Length > 0)
@@ -467,8 +403,6 @@ namespace Posroid
                         }
                     }
 
-                    //xfoods1.Elements().First().Remove();
-                    //xfoods2.Elements().First().Remove();
                     if (xfood1.HasElements)
                         xfoods1.Add(xfood1);
                     if (xfood2.HasElements)
@@ -477,37 +411,9 @@ namespace Posroid
                     return new XElement[] { xfoods1, xfoods2 };
                 }
                 else if (IsThereNoType1)
-                {
-                    //XElement xfoods = new XElement("Foods", new XAttribute("Type", type2));
-                    //if (calint.Length > 0)
-                    //    xfoods.Add(new XAttribute("Calories", calint));
-                    //else
-                    //    xfoods.Add(new XAttribute("Calories", -1));
-                    //for (Int32 i2 = 0; i2 < strfood.Count; i2 += 2)
-                    //{
-                    //    XElement xfood = new XElement("Food");
-                    //    xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", strfood[i2])));
-                    //    xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", strfood[i2 + 1])));
-                    //    xfoods.Add(xfood);
-                    //}
                     return new XElement[] { ParseSingleFoodData(strfood, calint, type2) };
-                }
                 else
-                {
-                    //XElement xfoods = new XElement("Foods", new XAttribute("Type", type1));
-                    //if (calint.Length > 0)
-                    //    xfoods.Add(new XAttribute("Calories", calint));
-                    //else
-                    //    xfoods.Add(new XAttribute("Calories", -1));
-                    //for (Int32 i2 = 0; i2 < strfood.Count; i2 += 2)
-                    //{
-                    //    XElement xfood = new XElement("Food");
-                    //    xfood.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", strfood[i2])));
-                    //    xfood.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", strfood[i2 + 1])));
-                    //    xfoods.Add(xfood);
-                    //}
                     return new XElement[] { ParseSingleFoodData(strfood, calint, type1) };
-                }
             }
             else
                 return new XElement[0];
@@ -589,7 +495,6 @@ namespace Posroid
                 }
             }
 
-            //xfoods.Elements().First().Remove();
             if (xfood.HasElements)
                 xfoods.Add(xfood);
 
@@ -651,6 +556,39 @@ namespace Posroid
         protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
             // TODO: Assign a collection of bindable groups to this.DefaultViewModel["Groups"]
+            Double previousHorizontalOffset = 0;
+            if (pageState != null && pageState.ContainsKey("ScrollOffset"))
+            {
+                previousHorizontalOffset = (Double)pageState["ScrollOffset"];
+            }
+            SetData(false, previousHorizontalOffset).AsAsyncAction().GetResults();
+        }
+
+        /// <summary>
+        /// Preserves state associated with this page in case the application is suspended or the
+        /// page is discarded from the navigation cache.  Values must conform to the serialization
+        /// requirements of <see cref="SuspensionManager.SessionState"/>.
+        /// </summary>
+        /// <param name="pageState">An empty dictionary to be populated with serializable state.</param>
+        protected override void SaveState(Dictionary<String, Object> pageState)
+        {
+            pageState["ScrollOffset"] = GetVisualChild<ScrollViewer>(itemGridView).HorizontalOffset;
+        }
+
+        public T GetVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            T child = default(T);
+            int numVisuals = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < numVisuals; i++)
+            {
+                DependencyObject v = (DependencyObject)VisualTreeHelper.GetChild(parent, i);
+                child = v as T;
+                if (child == null)
+                    child = GetVisualChild<T>(v);
+                if (child != null)
+                    break;
+            }
+            return child;
         }
 
         private void itemGridView_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
@@ -689,7 +627,33 @@ namespace Posroid
 
         private void ItemClicked(object sender, ItemClickEventArgs e)
         {
-            (sender as GridView).SelectedItem = e.ClickedItem;
+            GridView gridView = sender as GridView;
+            if (gridView.SelectedItems.Contains(e.ClickedItem))
+            {
+                if (gridView.SelectedItems.Count > 1)
+                {
+                    gridView.SelectedItem = e.ClickedItem;
+                }
+                else
+                {
+                    gridView.SelectedItems.Remove(e.ClickedItem);
+                }
+            }
+            else
+            {
+                gridView.SelectedItem = e.ClickedItem;
+            }
+        }
+
+        private async void RefreshButtonClicked(object sender, RoutedEventArgs e)
+        {
+            await SetData(true, GetVisualChild<ScrollViewer>(itemGridView).HorizontalOffset);
+        }
+
+        private void NavigateClicked(object sender, RoutedEventArgs e)
+        {
+            Day context = (sender as Button).DataContext as Day;
+            Frame.Navigate(typeof(DayDetailPage), context);
         }
     }
 
