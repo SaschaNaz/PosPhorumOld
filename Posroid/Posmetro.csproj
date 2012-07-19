@@ -114,18 +114,15 @@
     <Compile Include="Common\BindableBase.cs" />
     <Compile Include="Common\BooleanNegationConverter.cs" />
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
-    <Compile Include="MealBlockTall.xaml.cs">
-      <DependentUpon>MealBlockTall.xaml</DependentUpon>
-    </Compile>
     <Compile Include="CustomGridView.cs" />
     <Compile Include="CustomGroupedPage.xaml.cs">
       <DependentUpon>CustomGroupedPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DayDetailPage.xaml.cs">
+      <DependentUpon>DayDetailPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DietGroupedPage.xaml.cs">
       <DependentUpon>DietGroupedPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="GroupedItemsPage1.xaml.cs">
-      <DependentUpon>GroupedItemsPage1.xaml</DependentUpon>
     </Compile>
     <Compile Include="Common\LayoutAwarePage.cs" />
     <Compile Include="Common\RichTextColumns.cs" />
@@ -133,12 +130,6 @@
     <Compile Include="Diet.cs" />
     <Compile Include="DietDay.xaml.cs">
       <DependentUpon>DietDay.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainPage.xaml.cs">
-      <DependentUpon>MainPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MealBlockShort.xaml.cs">
-      <DependentUpon>MealBlockShort.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -154,15 +145,11 @@
     <Content Include="Assets\SmallLogo.png" />
     <Content Include="Assets\SplashScreen.png" />
     <Content Include="Assets\StoreLogo.png" />
-    <Page Include="MealBlockTall.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="DayDetailPage.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DietGroupedPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MealBlockShort.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -170,16 +157,8 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="GroupedItemsPage1.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Content Include="Common\ReadMe.txt" />
     <Page Include="DietDay.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
