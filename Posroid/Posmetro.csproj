@@ -115,9 +115,6 @@
     <Compile Include="Common\BooleanNegationConverter.cs" />
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
     <Compile Include="CustomGridView.cs" />
-    <Compile Include="CustomGroupedPage.xaml.cs">
-      <DependentUpon>CustomGroupedPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="DayDetailPage.xaml.cs">
       <DependentUpon>DayDetailPage.xaml</DependentUpon>
     </Compile>
@@ -150,10 +147,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DietGroupedPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CustomGroupedPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
