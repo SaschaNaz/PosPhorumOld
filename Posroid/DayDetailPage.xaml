@@ -201,10 +201,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
-                                <StackPanel Orientation="Horizontal" Margin="13,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" >
-                                    <TextBlock Text="{Binding Kilocalories}" Style="{StaticResource CaloriesTextStyle}" />
-                                    <TextBlock Text="kcal" Style="{StaticResource CaloriesTextStyle}" />
-                                </StackPanel>
+                                <TextBlock Margin="13,10,0,0" Text="{Binding Kilocalories, Converter={StaticResource intCaloriesConverter}}" Style="{StaticResource CaloriesTextStyle}" />
                                 <ItemsControl ItemsSource="{Binding Foods}" Grid.Row="1"  Margin="13,0,0,20" >
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -224,6 +221,71 @@
                     </DataTemplate>
                 </GridView.ItemTemplate>
             </GridView>
+            
+            <!-- Vertical scrolling list only used when snapped -->
+            <ListView
+                x:Name="itemListView"
+                AutomationProperties.AutomationId="ItemListView"
+                AutomationProperties.Name="Grouped Items"
+                Grid.Row="1"
+                Visibility="Collapsed"
+                Margin="0,-10,0,0"
+                Padding="10,0,0,60"
+                ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
+                SelectionMode="None">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel />
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid Margin="1,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Mealtime, Converter={StaticResource mealtimeStringConverter}}" FontSize="30" Foreground="Gray" FontWeight="Light" />
+                                </Grid>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ListView.GroupStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Type}" FontSize="70" Foreground="Gray" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Margin="13,10,0,0" Text="{Binding Kilocalories, Converter={StaticResource intCaloriesConverter}}" Style="{StaticResource CaloriesTextStyle}" />
+                                <ItemsControl ItemsSource="{Binding Foods}" Grid.Row="1"  Margin="13,0,0,20" >
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="- " Foreground="Black" FontSize="18" />
+                                                <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding langstr, Converter={StaticResource languageConverter}, ConverterParameter={StaticResource preferedLanguage}}" FontSize="18" TextWrapping="Wrap" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
             <!--<local:CustomGridView
                         x:Name="itemGridView"
                         AutomationProperties.AutomationId="ItemGridView"
@@ -320,6 +382,10 @@
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="backButton" Storyboard.TargetProperty="Style">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PortraitBackButtonStyle}"/>
                         </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemGridView" Storyboard.TargetProperty="Padding">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="96,0,10,56"/>
+                        </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
 
@@ -331,6 +397,13 @@
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="pageTitle" Storyboard.TargetProperty="Style">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource SnappedPageHeaderTextStyle}"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemListView" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemGridView" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
