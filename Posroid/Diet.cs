@@ -59,14 +59,14 @@ namespace Posroid
                         i++;
                     }
                     List<FoodsInfo> foods = time.WhatFoods.ToList();
-                    if (i != 0)
+                    if (i > 1)
                         foods.RemoveAt(lastNumber);
                     List<MealData> smalllist = new List<MealData>();
                     foreach (FoodsInfo info in foods)
                     {
                         smalllist.Add(new MealData(info, time.Mealtime, ServedDate, false));
                     }
-                    if (i != 0)
+                    if (i > 1)
                     {
                         FoodsInfo highest = time.WhatFoods[lastNumber];
                         smalllist.Insert(lastNumber, new MealData(highest, time.Mealtime, ServedDate, true));

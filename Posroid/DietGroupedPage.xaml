@@ -50,18 +50,16 @@
     <Page.BottomAppBar>
         <AppBar x:Name="bottomAppBar" Background="#FF00005D" BorderBrush="{StaticResource AppBarBorderThemeBrush}" IsSticky="True">
             <Grid>
-                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                    <Button Click="ClearButtonClicked" >
-                        <Button.Style>
-                            <Style BasedOn="{StaticResource AppBarButtonStyle}" TargetType="Button">
-                                <Setter Property="AutomationProperties.AutomationId" Value="NoAppBarButton"/>
-                                <Setter Property="AutomationProperties.Name" Value="Clear"/>
-                                <Setter Property="Content" Value="&#xE10A;"/>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <Button Click="RefreshButtonClicked" Style="{StaticResource RefreshAppBarButtonStyle}" />
-                </StackPanel>
+                <Button Click="ClearButtonClicked" >
+                    <Button.Style>
+                        <Style BasedOn="{StaticResource AppBarButtonStyle}" TargetType="Button">
+                            <Setter Property="AutomationProperties.AutomationId" Value="NoAppBarButton"/>
+                            <Setter Property="AutomationProperties.Name" Value="Clear"/>
+                            <Setter Property="Content" Value="&#xE10A;"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button HorizontalAlignment="Right" Click="RefreshButtonClicked" Style="{StaticResource RefreshAppBarButtonStyle}" />
             </Grid>
         </AppBar>
     </Page.BottomAppBar>
@@ -89,6 +87,12 @@
                 </Grid.ColumnDefinitions>
                 <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
                 <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Grid.Column="1" Style="{StaticResource PageHeaderTextStyle}"/>
+                <ComboBox Grid.Column="1" HorizontalAlignment="Left" Margin="352,56,0,0" Width="158" FontSize="20" Height="48" VerticalAlignment="Top" SelectionChanged="ComboBox_SelectionChanged_1">
+                    <ComboBox.Items>
+                        <ComboBoxItem Content="Korean" IsSelected="True" />
+                        <ComboBoxItem Content="English-US" />
+                    </ComboBox.Items>
+                </ComboBox>
             </Grid>
 
             <!-- Horizontal scrolling grid used in most view states -->
@@ -120,8 +124,8 @@
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
-                                            <Button Style="{StaticResource TextButtonStyle}" Content="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD-dayofweek}" Click="NavigateClicked"/>
-                                            <Rectangle Grid.Column="1" Margin="10" Width="120" Fill="{Binding ServedDate, Converter={StaticResource dayBrushConverter}}" HorizontalAlignment="Left"  />
+                                            <Button Grid.Column="1" Style="{StaticResource TextButtonStyle}" Content="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD-dayofweek}" Click="NavigateClicked"/>
+                                            <Rectangle Margin="0,10,10,10" Width="40" Height="40" Fill="{Binding ServedDate, Converter={StaticResource dayBrushConverter}}" HorizontalAlignment="Left"  />
                                         </Grid>
                                     </DataTemplate>
                                 </GroupStyle.HeaderTemplate>
@@ -178,7 +182,10 @@
                 Visibility="Collapsed"
                 Margin="0,-10,0,0"
                 Padding="10,0,0,60"
-                ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}">
+                ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
+                SelectionMode="Multiple" IsItemClickEnabled="True"
+                SelectionChanged="itemGridView_SelectionChanged_1"
+                ItemClick="ItemClicked">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel />
