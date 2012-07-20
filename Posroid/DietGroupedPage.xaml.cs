@@ -15,6 +15,7 @@ using System.Xml.Linq;
 using System.Net.Http;
 using Windows.Storage;
 using System.Threading.Tasks;
+using Windows.UI.ViewManagement;
 
 // The Grouped Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234231
 
@@ -28,6 +29,41 @@ namespace Posroid
         public DietGroupedPage()
         {
             this.InitializeComponent();
+            Window.Current.SizeChanged += Current_SizeChanged;
+        }
+
+        ApplicationViewState previousViewState;
+        void Current_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
+        {
+            ApplicationViewState myViewState = ApplicationView.Value;
+
+            IsSwitching = true;
+            switch (myViewState)
+            {
+                case ApplicationViewState.Snapped:
+                    {
+                        itemListView.SelectedItems.Clear();
+                        foreach (Object o in textList.Items)
+                        {
+                            itemListView.SelectedItems.Add(o);
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        if (previousViewState == ApplicationViewState.Snapped)
+                        {
+                            itemGridView.SelectedItems.Clear();
+                            foreach (Object o in textList.Items)
+                            {
+                                itemGridView.SelectedItems.Add(o);
+                            }
+                        }
+                        break;
+                    }
+            }
+            previousViewState = myViewState;
+            IsSwitching = false;
         }
 
         async Task SetData(Boolean ForceDataReload, Double horizontalOffset)
@@ -591,37 +627,43 @@ namespace Posroid
             return child;
         }
 
+        Boolean IsSwitching = false;
+
         private void itemGridView_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
-            if ((sender as ListViewBase).SelectedItems.Count == 0)
+            if (!IsSwitching)
             {
-                SidePopupColumn.Width = new GridLength(0);
-                bottomAppBar.IsOpen = false;
-                //bottomAppBar.IsSticky = false;
-            }
-            else
-            {
-                SidePopupColumn.Width = new GridLength(370);
-                if (!bottomAppBar.IsOpen)
+                if ((sender as ListViewBase).SelectedItems.Count == 0)
                 {
-                    bottomAppBar.IsOpen = true;
-                    //bottomAppBar.IsSticky = true;
+                    SidePopupColumn.Width = new GridLength(0);
+                    bottomAppBar.IsOpen = false;
+                    //bottomAppBar.IsSticky = false;
                 }
-            }
+                else
+                {
+                    SidePopupColumn.Width = new GridLength(370);
+                    if (!bottomAppBar.IsOpen)
+                    {
+                        bottomAppBar.IsOpen = true;
+                        //bottomAppBar.IsSticky = true;
+                    }
+                }
 
-            foreach (object o in e.AddedItems)
-            {
-                textList.Items.Insert(0, o);
-            }
-            foreach (object o in e.RemovedItems)
-            {
-                textList.Items.Remove(o);
+                foreach (object o in e.AddedItems)
+                {
+                    textList.Items.Insert(0, o);
+                }
+                foreach (object o in e.RemovedItems)
+                {
+                    textList.Items.Remove(o);
+                }
             }
         }
 
         private void ClearButtonClicked(object sender, RoutedEventArgs e)
         {
             itemGridView.SelectedItems.Clear();
+            itemListView.SelectedItems.Clear();
             bottomAppBar.IsOpen = false;
         }
 
