@@ -593,7 +593,7 @@ namespace Posroid
 
         private void itemGridView_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
-            if ((sender as GridView).SelectedItems.Count == 0)
+            if ((sender as ListViewBase).SelectedItems.Count == 0)
             {
                 SidePopupColumn.Width = new GridLength(0);
                 bottomAppBar.IsOpen = false;
@@ -627,7 +627,7 @@ namespace Posroid
 
         private void ItemClicked(object sender, ItemClickEventArgs e)
         {
-            GridView gridView = sender as GridView;
+            ListViewBase gridView = sender as ListViewBase;
             if (gridView.SelectedItems.Contains(e.ClickedItem))
             {
                 if (gridView.SelectedItems.Count > 1)
@@ -654,6 +654,17 @@ namespace Posroid
         {
             Day context = (sender as Button).DataContext as Day;
             Frame.Navigate(typeof(DayDetailPage), context);
+        }
+
+        private void ComboBox_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
+        {
+            switch (e.AddedItems[0] as String)
+            {
+                case "Korean":
+                    break;
+                case "English-US":
+                    break;
+            }
         }
     }
 
