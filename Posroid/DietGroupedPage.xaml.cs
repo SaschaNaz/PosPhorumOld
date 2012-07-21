@@ -66,7 +66,7 @@ namespace Posroid
             IsSwitching = false;
         }
 
-        async Task SetData(Boolean ForceDataReload, Double horizontalOffset)
+        async Task SetData(Boolean ForceDataReload, Double scrollOffset, Char offsetDirection)
         {
             Boolean IsNewDataNeeded = false;
 
@@ -134,8 +134,38 @@ namespace Posroid
             RoutedEventHandler handler = null;
             handler = delegate
              {
-                 if (horizontalOffset > 0)
-                     GetVisualChild<ScrollViewer>(itemGridView).ScrollToHorizontalOffset(horizontalOffset);
+                 if (ApplicationView.Value != ApplicationViewState.Snapped)
+                 {
+                     if (scrollOffset >= 0 && offsetDirection == 'H')
+                         GetVisualChild<ScrollViewer>(itemGridView).ScrollToHorizontalOffset(scrollOffset);
+                     else
+                     {
+                         foreach (object o in itemGridView.Items)
+                         {
+                             if ((o as MealData).ServedDate.Day == DateTime.Now.Day)
+                             {
+                                 itemGridView.ScrollIntoView(o, ScrollIntoViewAlignment.Leading);
+                                 break;
+                             }
+                         }
+                     }
+                 }
+                 else
+                 {
+                     if (scrollOffset >= 0 && offsetDirection == 'V')
+                         GetVisualChild<ScrollViewer>(itemListView).ScrollToVerticalOffset(scrollOffset);
+                     else
+                     {
+                         foreach (object o in itemListView.Items)
+                         {
+                             if ((o as MealData).ServedDate.Day == DateTime.Now.Day)
+                             {
+                                 itemListView.ScrollIntoView(o, ScrollIntoViewAlignment.Leading);
+                                 break;
+                             }
+                         }
+                     }
+                 }
                  itemGridView.Loaded -= handler;
              };
             itemGridView.Loaded += handler;
@@ -592,12 +622,16 @@ namespace Posroid
         protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
             // TODO: Assign a collection of bindable groups to this.DefaultViewModel["Groups"]
-            Double previousHorizontalOffset = 0;
-            if (pageState != null && pageState.ContainsKey("ScrollOffset"))
+            Double previousScrollOffset = -1;
+            Char previousDirection = 'H';
+            if (pageState != null)
             {
-                previousHorizontalOffset = (Double)pageState["ScrollOffset"];
+                if (pageState.ContainsKey("ScrollOffset"))
+                    previousScrollOffset = (Double)pageState["ScrollOffset"];
+                if (pageState.ContainsKey("PageViewState"))
+                    previousDirection = (Char)pageState["PageViewState"];
             }
-            SetData(false, previousHorizontalOffset).AsAsyncAction().GetResults();
+            SetData(false, previousScrollOffset, previousDirection).AsAsyncAction().GetResults();
         }
 
         /// <summary>
@@ -608,7 +642,25 @@ namespace Posroid
         /// <param name="pageState">An empty dictionary to be populated with serializable state.</param>
         protected override void SaveState(Dictionary<String, Object> pageState)
         {
-            pageState["ScrollOffset"] = GetVisualChild<ScrollViewer>(itemGridView).HorizontalOffset;
+            Char direction;
+            if (ApplicationView.Value == ApplicationViewState.Snapped)
+                direction = 'V';
+            else
+                direction = 'H';
+            pageState["PageViewState"] = direction;
+            switch(direction)
+            {
+                case 'H':
+                    {
+                        pageState["ScrollOffset"] = GetVisualChild<ScrollViewer>(itemGridView).HorizontalOffset;
+                        break;
+                    }
+                case 'V':
+                    {
+                        pageState["ScrollOffset"] = GetVisualChild<ScrollViewer>(itemListView).VerticalOffset;
+                        break;
+                    }
+            }
         }
 
         public T GetVisualChild<T>(DependencyObject parent) where T : DependencyObject
@@ -689,7 +741,12 @@ namespace Posroid
 
         private async void RefreshButtonClicked(object sender, RoutedEventArgs e)
         {
-            await SetData(true, GetVisualChild<ScrollViewer>(itemGridView).HorizontalOffset);
+            Char direction;
+            if (ApplicationView.Value == ApplicationViewState.Snapped)
+                direction = 'V';
+            else
+                direction = 'H';
+            await SetData(true, GetVisualChild<ScrollViewer>(itemGridView).HorizontalOffset, direction);
         }
 
         private void NavigateClicked(object sender, RoutedEventArgs e)
