@@ -211,7 +211,7 @@
                                                     <ColumnDefinition Width="*" />
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Text="- " Foreground="Black" FontSize="18" />
-                                                <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding langstr, Converter={StaticResource languageConverter}, ConverterParameter={StaticResource preferedLanguage}}" FontSize="18" TextWrapping="Wrap" />
+                                                <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding langstr, Converter={StaticResource languageConverter}}" FontSize="18" TextWrapping="Wrap" />
                                             </Grid>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -276,7 +276,7 @@
                                                     <ColumnDefinition Width="*" />
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Text="- " Foreground="Black" FontSize="18" />
-                                                <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding langstr, Converter={StaticResource languageConverter}, ConverterParameter={StaticResource preferedLanguage}}" FontSize="18" TextWrapping="Wrap" />
+                                                <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding langstr, Converter={StaticResource languageConverter}}" FontSize="18" TextWrapping="Wrap" />
                                             </Grid>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>

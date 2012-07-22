@@ -120,7 +120,7 @@ namespace Posroid
 
             LangString ls = (LangString)value;
 
-            if (parameter == null)
+            if (!(Boolean)Application.Current.Resources["ForceKorean"])
             {
                 //returns the name for OS default language for default value.
                 return ls.NameByLanguage(
@@ -128,7 +128,7 @@ namespace Posroid
             }
             else
             {
-                return ls.NameByLanguage(new Windows.Globalization.Language((String)parameter));
+                return ls.NameByLanguage(new Windows.Globalization.Language("ko"));
             }
         }
 
