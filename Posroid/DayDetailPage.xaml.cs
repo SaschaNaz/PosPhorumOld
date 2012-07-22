@@ -11,6 +11,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.ApplicationSettings;
+using Windows.Storage;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
@@ -26,6 +28,56 @@ namespace Posroid
             this.InitializeComponent();
         }
 
+        Popup _settingsPopup;
+        void DietGroupedPage_CommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
+        {
+            SettingsCommand cmd = new SettingsCommand("sample", "Language", (x) =>
+            {
+                Int32 _settingsWidth = 370;
+                Rect _windowBounds = Window.Current.Bounds;
+                _settingsPopup = new Popup();
+                _settingsPopup.Closed += OnPopupClosed;
+                Window.Current.Activated += OnWindowActivated;
+                _settingsPopup.IsLightDismissEnabled = true;
+                _settingsPopup.Width = _settingsWidth;
+                _settingsPopup.Height = _windowBounds.Height;
+
+                SimpleSettingsNarrow mypane = new SimpleSettingsNarrow()
+                {
+                    Width = _settingsWidth,
+                    Height = _windowBounds.Height
+                };
+                mypane.SettingChanged += delegate(object sender2, GlobalSettingChangedEventArgs e)
+                {
+                    ApplicationData.Current.LocalSettings.Values["ForceKorean"] = e.Value;
+                    Application.Current.Resources["ForceKorean"] = e.Value;
+                    Time[] abc = this.DefaultViewModel["MealTimes"] as Time[];
+                    this.DefaultViewModel["MealTimes"] = null;
+                    this.DefaultViewModel["MealTimes"] = abc;
+                };
+
+                _settingsPopup.Child = mypane;
+                _settingsPopup.SetValue(Canvas.LeftProperty, _windowBounds.Width - _settingsWidth);
+                _settingsPopup.SetValue(Canvas.TopProperty, 0);
+                _settingsPopup.IsOpen = true;
+            });
+
+            args.Request.ApplicationCommands.Add(cmd);
+        }
+
+        private void OnWindowActivated(object sender, Windows.UI.Core.WindowActivatedEventArgs e)
+        {
+            if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.Deactivated)
+            {
+                _settingsPopup.IsOpen = false;
+            }
+        }
+
+        void OnPopupClosed(object sender, object e)
+        {
+            Window.Current.Activated -= OnWindowActivated;
+        }
+
         /// <summary>
         /// Populates the page with content passed during navigation.  Any saved state is also
         /// provided when recreating a page from a prior session.
@@ -39,6 +91,8 @@ namespace Posroid
         {
             if (navigationParameter != null)
                 this.DefaultViewModel["MealTimes"] = (navigationParameter as Day).Times;
+            this.DefaultViewModel["ServedDate"] = (navigationParameter as Day).ServedDate;
+            SettingsPane.GetForCurrentView().CommandsRequested += DietGroupedPage_CommandsRequested;
         }
 
         /// <summary>
@@ -49,6 +103,7 @@ namespace Posroid
         /// <param name="pageState">An empty dictionary to be populated with serializable state.</param>
         protected override void SaveState(Dictionary<String, Object> pageState)
         {
+            SettingsPane.GetForCurrentView().CommandsRequested -= DietGroupedPage_CommandsRequested;
         }
     }
 }

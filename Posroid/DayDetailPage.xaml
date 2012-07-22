@@ -13,7 +13,6 @@
 
     <Page.Resources>
         <!-- TODO: Delete this line if the key AppName is declared in App.xaml -->
-        <x:String x:Key="AppName">(Date) Details</x:String>
         <CollectionViewSource
             x:Name="groupedItemsViewSource"
             Source="{Binding MealTimes}"
@@ -152,7 +151,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource LightBackButtonStyle}" />
-            <TextBlock x:Name="pageTitle" Grid.Column="1" Text="{StaticResource AppName}" Style="{StaticResource PageHeaderTextStyle}" Foreground="#DE000000"/>
+            <TextBlock x:Name="pageTitle" Text="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD/dayofweek}" Grid.Column="1" Style="{StaticResource PageHeaderTextStyle}" Foreground="#DE000000"/>
         </Grid>
         <Grid Grid.Row="1" >
             <GridView
