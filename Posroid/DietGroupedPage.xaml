@@ -71,8 +71,12 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition x:Name="SidePopupColumn" Width="0" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
         <Grid Style="{StaticResource LayoutRootStyle}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="140"/>
@@ -87,12 +91,6 @@
                 </Grid.ColumnDefinitions>
                 <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
                 <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Grid.Column="1" Style="{StaticResource PageHeaderTextStyle}"/>
-                <ComboBox Grid.Column="1" HorizontalAlignment="Left" Margin="352,56,0,0" Width="158" FontSize="20" Height="48" VerticalAlignment="Top" SelectionChanged="ComboBox_SelectionChanged_1">
-                    <ComboBox.Items>
-                        <ComboBoxItem Content="Korean" IsSelected="True" />
-                        <ComboBoxItem Content="English-US" />
-                    </ComboBox.Items>
-                </ComboBox>
             </Grid>
 
             <!-- Horizontal scrolling grid used in most view states -->
@@ -222,71 +220,74 @@
             </ListView>
         </Grid>
         
-        <ListView x:Name="textList"  Grid.Column="1" Margin="10,30,40,30" SelectionMode="None" >
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
+        <Grid x:Name="TextListContainer" Visibility="Collapsed" Grid.Column="1" Width="370">
+            <ListView x:Name="textList" Margin="10,30,40,30" SelectionMode="None" >
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel />
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
 
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="30" />
-                            <RowDefinition Height="30" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD/dayofweek}" Margin="5,10,0,0">
-                            <TextBlock.Style>
-                                <Style BasedOn="{StaticResource BaselineTextStyle}" TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="30"/>
-                                    <Setter Property="FontWeight" Value="Light"/>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        <TextBlock Grid.Row="1" Text="{Binding Mealtime, Converter={StaticResource mealtimeStringConverter}}" Margin="5,10,0,0">
-                            <TextBlock.Style>
-                                <Style BasedOn="{StaticResource BaselineTextStyle}" TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="25"/>
-                                    <Setter Property="FontWeight" Value="Light"/>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30" />
+                                <RowDefinition Height="30" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="{Binding ServedDate, Converter={StaticResource dateConverter}, ConverterParameter=MM/DD/dayofweek}" Margin="5,10,0,0">
+                                <TextBlock.Style>
+                                    <Style BasedOn="{StaticResource BaselineTextStyle}" TargetType="TextBlock">
+                                        <Setter Property="FontSize" Value="30"/>
+                                        <Setter Property="FontWeight" Value="Light"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="{Binding Mealtime, Converter={StaticResource mealtimeStringConverter}}" Margin="5,10,0,0">
+                                <TextBlock.Style>
+                                    <Style BasedOn="{StaticResource BaselineTextStyle}" TargetType="TextBlock">
+                                        <Setter Property="FontSize" Value="25"/>
+                                        <Setter Property="FontWeight" Value="Light"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
 
-                        <Grid Grid.Row="2" DataContext="{Binding FoodInformations}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Type}" FontSize="70" Foreground="#FFEEEEEE" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                            <Grid Grid.Column="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-                                <TextBlock Margin="13,10,0,0" Text="{Binding Kilocalories, Converter={StaticResource intCaloriesConverter}}" Style="{StaticResource CaloriesTextStyle}" />
-                                <ItemsControl ItemsSource="{Binding Foods}" Grid.Row="1"  Margin="13,0,0,20" >
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="- " FontSize="18" />
-                                                <TextBlock Grid.Column="1" Text="{Binding langstr, Converter={StaticResource languageConverter}, ConverterParameter={StaticResource preferedLanguage}}" FontSize="18" TextWrapping="Wrap" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                            <Grid Grid.Row="2" DataContext="{Binding FoodInformations}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Type}" FontSize="70" Foreground="#FFEEEEEE" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                <Grid Grid.Column="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Margin="13,10,0,0" Text="{Binding Kilocalories, Converter={StaticResource intCaloriesConverter}}" Style="{StaticResource CaloriesTextStyle}" />
+                                    <ItemsControl ItemsSource="{Binding Foods}" Grid.Row="1"  Margin="13,0,0,20" >
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="- " FontSize="18" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding langstr, Converter={StaticResource languageConverter}}" FontSize="18" TextWrapping="Wrap" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
                             </Grid>
                         </Grid>
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+
+          
         <VisualStateManager.VisualStateGroups>
 
             <!-- Visual states reflect the application's view state -->
@@ -303,6 +304,22 @@
 
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemGridView" Storyboard.TargetProperty="Padding">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="96,0,10,56"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextListContainer" Storyboard.TargetProperty="(Grid.Column)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextListContainer" Storyboard.TargetProperty="(Grid.Row)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextListContainer" Storyboard.TargetProperty="Width">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="NaN"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextListContainer" Storyboard.TargetProperty="Height">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="400"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="textList" Storyboard.TargetProperty="Margin">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="10,30,10,100"/>
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
@@ -325,6 +342,22 @@
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemGridView" Storyboard.TargetProperty="Visibility">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextListContainer" Storyboard.TargetProperty="(Grid.Column)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextListContainer" Storyboard.TargetProperty="(Grid.Row)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextListContainer" Storyboard.TargetProperty="Width">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="NaN"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextListContainer" Storyboard.TargetProperty="Height">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="400"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="textList" Storyboard.TargetProperty="Margin">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="10,30,10,100"/>
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>

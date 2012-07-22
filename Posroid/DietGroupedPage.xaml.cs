@@ -16,6 +16,8 @@ using System.Net.Http;
 using Windows.Storage;
 using System.Threading.Tasks;
 using Windows.UI.ViewManagement;
+using Windows.UI.ApplicationSettings;
+
 
 // The Grouped Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234231
 
@@ -26,11 +28,87 @@ namespace Posroid
     /// </summary>
     public sealed partial class DietGroupedPage : Posroid.Common.LayoutAwarePage
     {
+        Popup _settingsPopup;
+
         public DietGroupedPage()
         {
             this.InitializeComponent();
-            Window.Current.SizeChanged += Current_SizeChanged;
+            //preferedLanguage = "ko";
         }
+
+        void DietGroupedPage_CommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
+        {
+            SettingsCommand cmd = new SettingsCommand("sample", "Language", (x) =>
+                {
+                    Int32 _settingsWidth = 370;
+                    Rect _windowBounds = Window.Current.Bounds;
+                    _settingsPopup = new Popup();
+                    _settingsPopup.Closed += OnPopupClosed;
+                    Window.Current.Activated += OnWindowActivated;
+                    _settingsPopup.IsLightDismissEnabled = true;
+                    _settingsPopup.Width = _settingsWidth;
+                    _settingsPopup.Height = _windowBounds.Height;
+
+                    SimpleSettingsNarrow mypane = new SimpleSettingsNarrow()
+                    {
+                        Width = _settingsWidth,
+                        Height = _windowBounds.Height
+                    };
+                    mypane.SettingChanged += delegate(object sender2, GlobalSettingChangedEventArgs e)
+                    {
+                        LanguageOptionUpdate((Boolean)e.Value);
+                        //await new Windows.UI.Popups.MessageDialog(String.Format("Setting Changed: {0} / {1}", e.WhatSetting.ToString(), e.Value.ToString())).ShowAsync();
+                    };                    
+
+                    _settingsPopup.Child = mypane;
+                    _settingsPopup.SetValue(Canvas.LeftProperty, _windowBounds.Width - _settingsWidth);
+                    _settingsPopup.SetValue(Canvas.TopProperty, 0);
+                    _settingsPopup.IsOpen = true;
+                });
+
+            args.Request.ApplicationCommands.Add(cmd);
+        }
+
+        private void OnWindowActivated(object sender, Windows.UI.Core.WindowActivatedEventArgs e)
+        {
+            if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.Deactivated)
+            {
+                _settingsPopup.IsOpen = false;
+            }
+        }
+
+        void OnPopupClosed(object sender, object e)
+        {
+            Window.Current.Activated -= OnWindowActivated;
+        }
+
+        void LanguageOptionUpdate(Boolean b)
+        {
+            ApplicationData.Current.LocalSettings.Values["ForceKorean"] = b;
+            Application.Current.Resources["ForceKorean"] = b;
+            //Application.Current.Resources["preferedLanguage"] = "en-US";
+            List<object> templist = textList.Items.ToList();
+            textList.Items.Clear();
+            foreach (Object o in templist)
+                textList.Items.Add(o);
+            //await Refresh();
+        }
+
+        //public String preferedLanguage
+        //{
+        //    //get
+        //    //{
+        //    //    if ((Boolean)Application.Current.Resources["ForceKorean"])
+        //    //        return "ko";
+        //    //    else
+        //    //    {
+        //    //        return null;
+        //    //    }
+        //    //}
+        //    get;
+        //    set;
+        //}
+        
 
         ApplicationViewState previousViewState;
         void Current_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
@@ -632,6 +710,8 @@ namespace Posroid
                     previousDirection = (Char)pageState["PageViewState"];
             }
             SetData(false, previousScrollOffset, previousDirection).AsAsyncAction().GetResults();
+            SettingsPane.GetForCurrentView().CommandsRequested += DietGroupedPage_CommandsRequested;
+            Window.Current.SizeChanged += Current_SizeChanged;
         }
 
         /// <summary>
@@ -661,6 +741,8 @@ namespace Posroid
                         break;
                     }
             }
+            SettingsPane.GetForCurrentView().CommandsRequested -= DietGroupedPage_CommandsRequested;
+            Window.Current.SizeChanged -= Current_SizeChanged;
         }
 
         public T GetVisualChild<T>(DependencyObject parent) where T : DependencyObject
@@ -687,13 +769,13 @@ namespace Posroid
             {
                 if ((sender as ListViewBase).SelectedItems.Count == 0)
                 {
-                    SidePopupColumn.Width = new GridLength(0);
+                    TextListContainer.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                     bottomAppBar.IsOpen = false;
                     //bottomAppBar.IsSticky = false;
                 }
                 else
                 {
-                    SidePopupColumn.Width = new GridLength(370);
+                    TextListContainer.Visibility = Windows.UI.Xaml.Visibility.Visible;
                     if (!bottomAppBar.IsOpen)
                     {
                         bottomAppBar.IsOpen = true;
@@ -740,6 +822,11 @@ namespace Posroid
         }
 
         private async void RefreshButtonClicked(object sender, RoutedEventArgs e)
+        {
+            await Refresh();
+        }
+
+        async Task Refresh()
         {
             Char direction;
             if (ApplicationView.Value == ApplicationViewState.Snapped)

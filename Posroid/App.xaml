@@ -13,19 +13,18 @@
                     Required by Visual Studio project and item templates
                  -->
                 <ResourceDictionary Source="Common/StandardStyles.xaml"/>
-                <ResourceDictionary>
-                    <local:DateConverter x:Key="dateConverter" />
-                    <local:LanguageConverter x:Key="languageConverter" />
-                    <local:DayBrushConverter x:Key="dayBrushConverter" />
-                    <!--<local:MealInfoConverter x:Key="mealInfoConverter" />-->
-                    <local:MealtimeBrushConverter x:Key="mealtimeBrushConverter" />
-                    <local:MealtimeStringConverter x:Key="mealtimeStringConverter" />
-                    <local:IntCaloriesConverter x:Key="intCaloriesConverter" />
-                    <!--<local:MealFoodConverter x:Key="mealFoodConverter" />-->
-                    <x:String x:Key="preferedLanguage">ko</x:String>
-                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-
+            
+            <local:DateConverter x:Key="dateConverter" />
+            <local:LanguageConverter x:Key="languageConverter" />
+            <local:DayBrushConverter x:Key="dayBrushConverter" />
+            <!--<local:MealInfoConverter x:Key="mealInfoConverter" />-->
+            <local:MealtimeBrushConverter x:Key="mealtimeBrushConverter" />
+            <local:MealtimeStringConverter x:Key="mealtimeStringConverter" />
+            <local:IntCaloriesConverter x:Key="intCaloriesConverter" />
+            <!--<local:MealFoodConverter x:Key="mealFoodConverter" />-->
+            <!--<x:String x:Key="preferedLanguage">ko</x:String>-->
+            <x:Boolean x:Key="ForceKorean">True</x:Boolean>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
