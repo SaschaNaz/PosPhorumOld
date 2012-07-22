@@ -56,7 +56,9 @@ namespace Posroid
                     };
                     mypane.SettingChanged += delegate(object sender2, GlobalSettingChangedEventArgs e)
                     {
-                        LanguageOptionUpdate((Boolean)e.Value);
+                        ApplicationData.Current.LocalSettings.Values["ForceKorean"] = e.Value;
+                        Application.Current.Resources["ForceKorean"] = e.Value;
+                        LanguageOptionUpdate();
                         //await new Windows.UI.Popups.MessageDialog(String.Format("Setting Changed: {0} / {1}", e.WhatSetting.ToString(), e.Value.ToString())).ShowAsync();
                     };                    
 
@@ -82,10 +84,8 @@ namespace Posroid
             Window.Current.Activated -= OnWindowActivated;
         }
 
-        void LanguageOptionUpdate(Boolean b)
+        void LanguageOptionUpdate()
         {
-            ApplicationData.Current.LocalSettings.Values["ForceKorean"] = b;
-            Application.Current.Resources["ForceKorean"] = b;
             //Application.Current.Resources["preferedLanguage"] = "en-US";
             List<object> templist = textList.Items.ToList();
             textList.Items.Clear();
@@ -179,9 +179,9 @@ namespace Posroid
             else
                 IsNewDataNeeded = true;
 
+            String message = null;
             if (IsNewDataNeeded)
             {
-                String errorMessage = null;
                 try
                 {
                     XDocument parsedMenu = await ParseDietmenu();
@@ -196,57 +196,61 @@ namespace Posroid
                     }
                     else
                     {
-                        await new Windows.UI.Popups.MessageDialog("이번 주 새 식단표가 아직 올라오지 않았습니다.").ShowAsync();
+                        if (!Application.Current.Resources.ContainsKey("NewDataChecked"))
+                        {
+                            message = "이번 주 새 식단표가 아직 올라오지 않았습니다. 몇 시간 뒤에 리프레시해서 다시 확인해 주세요.";
+                            Application.Current.Resources["NewDataChecked"] = true;
+                        }
                     }
                 }
                 catch (HttpRequestException)
                 {
-                    errorMessage = "서버에 문제가 있거나 인터넷 연결이 원활하지 않습니다. 상태를 확인해 주신 후 앺 바에서 리프레시 버튼을 눌러 시간표를 다시 읽어 주시기 바랍니다.";
+                    message = "서버에 문제가 있거나 인터넷 연결이 원활하지 않습니다. 상태를 확인해 주신 후 앺 바에서 리프레시 버튼을 눌러 시간표를 다시 읽어 주시기 바랍니다.";
                 }
-
-                if (errorMessage != null)
-                    await new Windows.UI.Popups.MessageDialog(errorMessage).ShowAsync();
                 //localSettings.Values["dietMenuData"] = dietMenu.Stringify();
             }
 
             RoutedEventHandler handler = null;
             handler = delegate
-             {
-                 if (ApplicationView.Value != ApplicationViewState.Snapped)
-                 {
-                     if (scrollOffset >= 0 && offsetDirection == 'H')
-                         GetVisualChild<ScrollViewer>(itemGridView).ScrollToHorizontalOffset(scrollOffset);
-                     else
-                     {
-                         foreach (object o in itemGridView.Items)
-                         {
-                             if ((o as MealData).ServedDate.Day == DateTime.Now.Day)
-                             {
-                                 itemGridView.ScrollIntoView(o, ScrollIntoViewAlignment.Leading);
-                                 break;
-                             }
-                         }
-                     }
-                 }
-                 else
-                 {
-                     if (scrollOffset >= 0 && offsetDirection == 'V')
-                         GetVisualChild<ScrollViewer>(itemListView).ScrollToVerticalOffset(scrollOffset);
-                     else
-                     {
-                         foreach (object o in itemListView.Items)
-                         {
-                             if ((o as MealData).ServedDate.Day == DateTime.Now.Day)
-                             {
-                                 itemListView.ScrollIntoView(o, ScrollIntoViewAlignment.Leading);
-                                 break;
-                             }
-                         }
-                     }
-                 }
-                 itemGridView.Loaded -= handler;
-             };
+            {
+                if (ApplicationView.Value != ApplicationViewState.Snapped)
+                {
+                    if (scrollOffset >= 0 && offsetDirection == 'H')
+                        GetVisualChild<ScrollViewer>(itemGridView).ScrollToHorizontalOffset(scrollOffset);
+                    else
+                    {
+                        foreach (object o in itemGridView.Items)
+                        {
+                            if ((o as MealData).ServedDate.Day == DateTime.Now.Day)
+                            {
+                                itemGridView.ScrollIntoView(o, ScrollIntoViewAlignment.Leading);
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (scrollOffset >= 0 && offsetDirection == 'V')
+                        GetVisualChild<ScrollViewer>(itemListView).ScrollToVerticalOffset(scrollOffset);
+                    else
+                    {
+                        foreach (object o in itemListView.Items)
+                        {
+                            if ((o as MealData).ServedDate.Day == DateTime.Now.Day)
+                            {
+                                itemListView.ScrollIntoView(o, ScrollIntoViewAlignment.Leading);
+                                break;
+                            }
+                        }
+                    }
+                }
+                itemGridView.Loaded -= handler;
+            };
             itemGridView.Loaded += handler;
+
+            if (message != null)
+                await new Windows.UI.Popups.MessageDialog(message).ShowAsync();
         }
 
         async Task<XDocument> ParseDietmenu()
@@ -828,6 +832,7 @@ namespace Posroid
 
         async Task Refresh()
         {
+            Application.Current.Resources.Remove("NewDataChecked");
             Char direction;
             if (ApplicationView.Value == ApplicationViewState.Snapped)
                 direction = 'V';
