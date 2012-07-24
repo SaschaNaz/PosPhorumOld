@@ -120,16 +120,22 @@ namespace Posroid
 
             LangString ls = (LangString)value;
 
+            String returner;
             if (!(Boolean)Application.Current.Resources["ForceKorean"])
             {
                 //returns the name for OS default language for default value.
-                return ls.NameByLanguage(
+                returner = ls.NameByLanguage(
                     new Windows.Globalization.Language(Windows.Globalization.ApplicationLanguages.Languages[0]));
             }
             else
             {
-                return ls.NameByLanguage(new Windows.Globalization.Language("ko"));
+                returner = ls.NameByLanguage(new Windows.Globalization.Language("ko"));
             }
+
+            if (parameter != null)
+                return parameter + returner;
+            else
+                return returner;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string culture)
@@ -224,17 +230,18 @@ namespace Posroid
                 throw new ArgumentException("Value must be of type When.", "value");
 
             When mealtime = (When)value;
+            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
 
             switch (mealtime)
             {
                 case When.Breakfast:
-                    return "Breakfast";
+                    return loader.GetString("Breakfast");
                 case When.Lunch:
-                    return "Lunch";
+                    return loader.GetString("Lunch");
                 case When.Dinner:
-                    return "Dinner";
+                    return loader.GetString("Dinner");
                 default:
-                    return "(Error)";
+                    return loader.GetString("(Error)");
             }
         }
 
