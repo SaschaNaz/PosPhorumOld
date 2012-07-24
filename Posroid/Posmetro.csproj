@@ -138,7 +138,8 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="Posroid_TemporaryKey.pfx" />
-    <PRIResource Include="Strings\Resources.resw" />
+    <PRIResource Include="Strings\ko\Resources.resw" />
+    <PRIResource Include="Strings\en-US\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Logo.png" />

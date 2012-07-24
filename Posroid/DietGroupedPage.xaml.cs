@@ -403,7 +403,7 @@ namespace Posroid
 
             Boolean IsThereNoType1 = false, IsThereNoType2 = false;//C, D는 항상 함께 있을 거 같죠? ㅎㅎㅎㅎㅎㅎㅎ.... 'D코너' 한줄 추가되어 있고 C코너 사라진 꼴을 보셔야 ㅎㅎㅎ
 
-            if (strfood.Count != 0)
+            if (strfood.Count > 1)
             {
                 if (strfood.First().Contains(String.Format("{0}코너", type1)))//왜 StartsWith 안쓰고 Contains 쓰냐면... 어떤주엔 'D코너' 써놓고 어떤주엔 '<D코너>' 써놓거든요. 제발 <D>는 안 썼으면...
                 {
@@ -417,7 +417,7 @@ namespace Posroid
                 }//첫번째 줄을 무조건 지우면 안 돼요... 홀수인 이유가 코너이름 적으려고도 있겠지만 엔터치고 괄호안에 원산지 등 추가정보 적으면서 저렇게 되는 경우가 있어서...
             }
 
-            if (strfood.Count != 0)
+            if (strfood.Count > 1)
             {
                 String calint = "";
                 {
@@ -434,6 +434,16 @@ namespace Posroid
 
                 if (!IsThereNoType1 && !IsThereNoType2)
                 {
+                    for (Int32 i = 1; i < strfood.Count; i++)//기본적으론 C와 D는 슬래시로만 구분되지만, 슬래시 앞에 엔터로 또 구분되어 있는 경우가 있다
+                    {
+                        if (strfood[i][0] == '/')
+                        {
+                            strfood[i - 1] += strfood[i];
+                            strfood.Remove(strfood[i]);
+                            i--;
+                        }
+                    }
+
                     XElement xfoods1 = new XElement("Foods", new XAttribute("Type", type1));
                     XElement xfoods2 = new XElement("Foods", new XAttribute("Type", type2));
                     if (calint.Length > 0)

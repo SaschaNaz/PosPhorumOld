@@ -182,20 +182,20 @@
                         </GroupStyle.HeaderTemplate>
                         <GroupStyle.Panel>
                             <ItemsPanelTemplate>
-                                <VariableSizedWrapGrid Orientation="Vertical" Margin="0,0,80,0" ItemWidth="200" />
+                                <VariableSizedWrapGrid Orientation="Horizontal" Margin="0,0,80,0" />
                             </ItemsPanelTemplate>
                         </GroupStyle.Panel>
                     </GroupStyle>
                 </GridView.GroupStyle>
                 <GridView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Width="190">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                        <Grid Height="300">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="80" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
                             <TextBlock Text="{Binding Type}" FontSize="70" Foreground="Gray" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                            <Grid Grid.Column="1">
+                            <Grid Grid.Row="1">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
@@ -209,8 +209,8 @@
                                                     <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="*" />
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Text="- " Foreground="Black" FontSize="18" />
-                                                <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding langstr, Converter={StaticResource languageConverter}}" FontSize="18" TextWrapping="Wrap" />
+                                                <TextBlock Text="- " Foreground="Black" FontSize="18" Margin="0,10,0,0" />
+                                                <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding langstr, Converter={StaticResource languageConverter}}" FontSize="18" TextWrapping="Wrap" Margin="0,10,0,0"  />
                                             </Grid>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
