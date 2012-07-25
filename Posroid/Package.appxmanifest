@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
-  <Identity Name="bae51621-5f07-4df2-b85d-5cfa48fab5f9" Publisher="CN=Sangmin" Version="1.0.0.1" />
+  <Identity Name="bae51621-5f07-4df2-b85d-5cfa48fab5f9" Publisher="CN=Sangmin" Version="1.0.0.2" />
   <Properties>
     <DisplayName>Posroid</DisplayName>
     <PublisherDisplayName>Sangmin</PublisherDisplayName>
