@@ -278,10 +278,18 @@ namespace Posroid
                     str = str.Remove(str.IndexOf("<![if !supportMisalignedRows]>"), str.IndexOf("<![endif]>") - str.IndexOf("<![if !supportMisalignedRows]>") + 10);
                     str = str.Replace("</html>", "</body></html>");
                     XElement xelm = XElement.Parse(str);
-                    XElement[] tablerows = xelm.Elements("body").First()
-                        .Elements("p").ElementAt(6)//contains table
-                        .Elements().First()//table
-                        .Elements().ToArray();//tablerows
+                    XElement[] tablerows;
+                    {
+                        XElement body = xelm.Element("body");
+                        XElement table = null;
+                        foreach(XElement xp in body.Elements("p"))
+                        {
+                            table = xp.Element("table");
+                            if (table != null)
+                                break;
+                        }//contains table
+                        tablerows = table.Elements().ToArray();//tablerows
+                    }
 
                     for (Int32 i = 3; i < tablerows.Length - 1; i += 2)//each row is for a day, 기둥 뒤에 공간 있...는 게 아니라 표 끝에 빈 줄 하나 있습니다. 진짜예요 height=0으로..;;;
                     {
