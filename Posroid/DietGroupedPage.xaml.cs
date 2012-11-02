@@ -146,6 +146,7 @@ namespace Posroid
 
         async Task SetData(Boolean ForceDataReload, Double scrollOffset, Char offsetDirection)
         {
+            semanticView.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             Boolean IsNewDataNeeded = false;
 
             StorageFolder localFolder = ApplicationData.Current.LocalFolder;
@@ -213,44 +214,50 @@ namespace Posroid
             RoutedEventHandler handler = null;
             handler = delegate
             {
-                if (ApplicationView.Value != ApplicationViewState.Snapped)
-                {
-                    if (scrollOffset >= 0 && offsetDirection == 'H')
-                        GetVisualChild<ScrollViewer>(itemGridView).ScrollToHorizontalOffset(scrollOffset);
-                    else
-                    {
-                        foreach (object o in itemGridView.Items)
-                        {
-                            if ((o as MealData).ServedDate.Day == DateTime.Now.Day)
-                            {
-                                itemGridView.ScrollIntoView(o, ScrollIntoViewAlignment.Leading);
-                                break;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if (scrollOffset >= 0 && offsetDirection == 'V')
-                        GetVisualChild<ScrollViewer>(itemListView).ScrollToVerticalOffset(scrollOffset);
-                    else
-                    {
-                        foreach (object o in itemListView.Items)
-                        {
-                            if ((o as MealData).ServedDate.Day == DateTime.Now.Day)
-                            {
-                                itemListView.ScrollIntoView(o, ScrollIntoViewAlignment.Leading);
-                                break;
-                            }
-                        }
-                    }
-                }
+                setOffset(scrollOffset, offsetDirection);
                 itemGridView.Loaded -= handler;
             };
             itemGridView.Loaded += handler;
+            semanticView.Visibility = Windows.UI.Xaml.Visibility.Visible;
 
             if (message != null)
                 await new Windows.UI.Popups.MessageDialog(message).ShowAsync();
+        }
+
+        void setOffset(Double scrollOffset, Char offsetDirection)
+        {
+            if (ApplicationView.Value != ApplicationViewState.Snapped)
+            {
+                if (scrollOffset >= 0 && offsetDirection == 'H')
+                    GetVisualChild<ScrollViewer>(itemGridView).ScrollToHorizontalOffset(scrollOffset);
+                else
+                {
+                    foreach (object o in itemGridView.Items)
+                    {
+                        if ((o as MealData).ServedDate.Day == DateTime.Now.Day)
+                        {
+                            itemGridView.ScrollIntoView(o, ScrollIntoViewAlignment.Leading);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (scrollOffset >= 0 && offsetDirection == 'V')
+                    GetVisualChild<ScrollViewer>(itemListView).ScrollToVerticalOffset(scrollOffset);
+                else
+                {
+                    foreach (object o in itemListView.Items)
+                    {
+                        if ((o as MealData).ServedDate.Day == DateTime.Now.Day)
+                        {
+                            itemListView.ScrollIntoView(o, ScrollIntoViewAlignment.Leading);
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         async Task<XDocument> ParseDietmenu()
