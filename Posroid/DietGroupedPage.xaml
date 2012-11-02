@@ -32,16 +32,16 @@
         <local:MealBlockDataTemplateSelector x:Key="mealBlockDataTemplateSelector" />
         <DataTemplate x:Key="mealBlockShortTemplate">
             <Grid Background="{Binding Mealtime, Converter={StaticResource mealtimeBrushConverter}}" Width="130" Height="130">
-                <TextBlock Text="{Binding FoodInformations.Type}" FontSize="80" FontWeight="Light" Margin="69,-10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" />
-                <TextBlock Text="{Binding FoodInformations.Kilocalories, Converter={StaticResource intCaloriesConverter}}" FontSize="13" VerticalAlignment="Bottom" Margin="10,0,0,30" HorizontalAlignment="Left" />
-                <TextBlock Text="{Binding Mealtime, Converter={StaticResource mealtimeStringConverter}}" FontSize="13" VerticalAlignment="Bottom" Margin="10" HorizontalAlignment="Left" />
+                <TextBlock Text="{Binding FoodInformations.Type}" FontSize="80" FontWeight="Light" Margin="14,-10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" />
+                <TextBlock Text="{Binding FoodInformations.Kilocalories, Converter={StaticResource intCaloriesConverter}}" FontSize="13" VerticalAlignment="Bottom" Margin="10" HorizontalAlignment="Right" />
+                <TextBlock Text="{Binding Mealtime, Converter={StaticResource mealtimeStringConverter}}" FontSize="15" VerticalAlignment="Top" Margin="19,80,0,0" HorizontalAlignment="Left" />
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="mealBlockTallTemplate">
             <Grid Background="{Binding Mealtime, Converter={StaticResource mealtimeBrushConverter}}" Width="130" Height="270">
-                <TextBlock Text="{Binding FoodInformations.Type}" FontSize="80" FontWeight="Light" Margin="69,-10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" />
-                <TextBlock Text="{Binding FoodInformations.Kilocalories, Converter={StaticResource intCaloriesConverter}}" FontSize="26" VerticalAlignment="Bottom" Margin="10,0,0,30" HorizontalAlignment="Left" />
-                <TextBlock Text="{Binding Mealtime, Converter={StaticResource mealtimeStringConverter}}" FontSize="13" VerticalAlignment="Bottom" Margin="10" HorizontalAlignment="Left" />
+                <TextBlock Text="{Binding FoodInformations.Type}" FontSize="80" FontWeight="Light" Margin="14,-10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" />
+                <TextBlock Text="{Binding FoodInformations.Kilocalories, Converter={StaticResource intCaloriesConverter}}" FontSize="26" VerticalAlignment="Bottom" Margin="10" HorizontalAlignment="Right" />
+                <TextBlock Text="{Binding Mealtime, Converter={StaticResource mealtimeStringConverter}}" FontSize="15" VerticalAlignment="Top" Margin="19,80,0,0" HorizontalAlignment="Left" />
             </Grid>
         </DataTemplate>
     </Page.Resources>
@@ -93,7 +93,7 @@
             </Grid>
 
             <!-- Horizontal scrolling grid used in most view states -->
-            <SemanticZoom Grid.Row="1">
+            <SemanticZoom x:Name="semanticView" Grid.Row="1" Visibility="Collapsed">
                 <SemanticZoom.ZoomedInView>
                     <local:CustomGridView
                         x:Name="itemGridView"
