@@ -376,19 +376,24 @@ namespace Posroid
                 }
             }
 
-            String calint = "";
+            if (strfood.Count > 1)
             {
-                XElement[] foodcode = column2
-                    .Elements().ToArray();//p
-                foreach (XElement code in foodcode)
+                String calint = "";
                 {
-                    foreach (XElement fontcode in code.Elements())//font 태그는 한 개만 있을 거 같죠? ㅎㅎㅎ... 내용 빈 font 태그 한번 보셔야...
+                    XElement[] foodcode = column2
+                        .Elements().ToArray();//p
+                    foreach (XElement code in foodcode)
                     {
-                        calint += fontcode.Value;
+                        foreach (XElement fontcode in code.Elements())//font 태그는 한 개만 있을 거 같죠? ㅎㅎㅎ... 내용 빈 font 태그 한번 보셔야...
+                        {
+                            calint += fontcode.Value;
+                        }
                     }
                 }
+                return ParseSingleFoodData(strfood, calint, type);
             }
-            return ParseSingleFoodData(strfood, calint, type);
+            else
+                return null;
         }
 
         /// <summary>
@@ -418,7 +423,7 @@ namespace Posroid
 
             Boolean IsThereNoType1 = false, IsThereNoType2 = false;//C, D는 항상 함께 있을 거 같죠? ㅎㅎㅎㅎㅎㅎㅎ.... 'D코너' 한줄 추가되어 있고 C코너 사라진 꼴을 보셔야 ㅎㅎㅎ
 
-            if (strfood.Count > 1)
+            if (strfood.Count > 1)//코너 하나만 있는지 모두 있는지 판별. 하나만 있는 경우는 최상단에 해당 코너 이름을 써 주는 관습이 있습니다.
             {
                 if (strfood.First().Contains(String.Format("{0}코너", type1)))//왜 StartsWith 안쓰고 Contains 쓰냐면... 어떤주엔 'D코너' 써놓고 어떤주엔 '<D코너>' 써놓거든요. 제발 <D>는 안 썼으면...
                 {
@@ -432,7 +437,7 @@ namespace Posroid
                 }//첫번째 줄을 무조건 지우면 안 돼요... 홀수인 이유가 코너이름 적으려고도 있겠지만 엔터치고 괄호안에 원산지 등 추가정보 적으면서 저렇게 되는 경우가 있어서...
             }
 
-            if (strfood.Count > 1)
+            if (strfood.Count > 1)//<행사이름> 써 놓고 그 이상 아무것도 없을 때 오류 방지
             {
                 String calint = "";
                 {
@@ -512,8 +517,13 @@ namespace Posroid
                                             xfoods2.Add(xfood2);
                                             xfood1 = new XElement("Food");
                                             xfood2 = new XElement("Food");
+                                            xfood1.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", "[이름 미등록]")));
+                                            xfood2.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", "[이름 미등록]")));
                                             xfood1.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted[0])));
-                                            xfood2.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted[1])));
+                                            if (splitted.Length > 1)
+                                                xfood2.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted[1])));
+                                            else
+                                                xfood2.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", "[name unregistered]")));
                                             break;
                                         }
                                     case 'K':
@@ -523,7 +533,10 @@ namespace Posroid
                                             xfood1 = new XElement("Food");
                                             xfood2 = new XElement("Food");
                                             xfood1.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted[0])));
-                                            xfood2.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted[1])));
+                                            if (splitted.Length > 1)
+                                                xfood2.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted[1])));
+                                            else
+                                                xfood2.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", "[이름 미등록]")));
                                             break;
                                         }
                                 }
@@ -534,19 +547,27 @@ namespace Posroid
                                     case 'E':
                                         {
                                             xfood1.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted[0])));
-                                            xfood2.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted[1])));
+                                            if (splitted.Length > 1)
+                                                xfood2.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", splitted[1])));
+                                            else
+                                                xfood2.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", "[name unregistered]")));
                                             //xfoods.Add(xfood);
                                             //xfood = new XElement("Food");
                                             break;
                                         }
                                     case 'K':
                                         {
+                                            xfood1.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", "[name unregistered]")));
+                                            xfood2.Add(new XElement("Name", new XAttribute("language", "en-US"), new XAttribute("Value", "[name unregistered]")));
                                             xfoods1.Add(xfood1);
                                             xfoods2.Add(xfood2);
                                             xfood1 = new XElement("Food");
                                             xfood2 = new XElement("Food");
                                             xfood1.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted[0])));
-                                            xfood2.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted[1])));
+                                            if (splitted.Length > 1)
+                                                xfood2.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", splitted[1])));
+                                            else
+                                                xfood2.Add(new XElement("Name", new XAttribute("language", "ko"), new XAttribute("Value", "[이름 미등록]")));
                                             break;
                                         }
                                 }
