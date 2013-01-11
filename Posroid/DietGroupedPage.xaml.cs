@@ -880,11 +880,20 @@ namespace Posroid
         {
             Application.Current.Resources.Remove("NewDataChecked");
             Char direction;
-            if (ApplicationView.Value == ApplicationViewState.Snapped)
-                direction = 'V';
-            else
+            if (ApplicationView.Value != ApplicationViewState.Snapped)
                 direction = 'H';
-            await SetData(true, GetVisualChild<ScrollViewer>(itemGridView).HorizontalOffset, direction);
+            else
+                direction = 'V';
+            Double offset;
+            ScrollViewer viewer = GetVisualChild<ScrollViewer>(itemGridView);
+            if (viewer != null)
+                if (direction == 'V')
+                    offset = viewer.VerticalOffset;
+                else//'H'
+                    offset = viewer.HorizontalOffset;
+            else
+                offset = 0;
+            await SetData(true, offset, direction);
         }
 
         private void NavigateClicked(object sender, RoutedEventArgs e)
