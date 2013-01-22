@@ -310,7 +310,7 @@ namespace Posroid
                                 .Elements().First()//p
                                 .Elements().First()//font
                                 .Value.Split('\n');//날짜 및 요일
-                            String[] monthday = daydayofweek[0].Split('/');
+                            String[] monthday = SplitIntoTwoBySlash(daydayofweek[0]);
                             xday.Add(
                                 new XAttribute("Month", Convert.ToInt32(monthday[0])),
                                 new XAttribute("Day", Convert.ToInt32(monthday[1])));
@@ -468,7 +468,7 @@ namespace Posroid
                     XElement xfoods2 = new XElement("Foods", new XAttribute("Type", type2));
                     if (calint.Length > 0)
                     {
-                        String[] splittedcalories = calint.Split('/');
+                        String[] splittedcalories = SplitIntoTwoBySlash(calint);
                         xfoods1.Add(new XAttribute("Calories", splittedcalories[0]));
                         xfoods2.Add(new XAttribute("Calories", splittedcalories[1]));
                     }
@@ -500,7 +500,7 @@ namespace Posroid
                         }
 
                         //문자열 처리부분
-                        String[] splitted = str.Split('/');
+                        String[] splitted = SplitIntoTwoBySlash(str);
                         Char PresentLineLanguage;
                         if (IsEnglish(str))
                             PresentLineLanguage = 'E';
@@ -736,6 +736,11 @@ namespace Posroid
                     return false;
             }
             return true;
+        }
+
+        String[] SplitIntoTwoBySlash(String str)
+        {
+            return str.Split(new Char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         /// <summary>
