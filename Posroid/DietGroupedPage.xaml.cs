@@ -469,8 +469,33 @@ namespace Posroid
                     if (calint.Length > 0)
                     {
                         String[] splittedcalories = SplitIntoTwoBySlash(calint);
-                        xfoods1.Add(new XAttribute("Calories", splittedcalories[0]));
-                        xfoods2.Add(new XAttribute("Calories", splittedcalories[1]));
+                        if (splittedcalories.Length > 1)
+                        {
+                            xfoods1.Add(new XAttribute("Calories", splittedcalories[0]));
+                            xfoods2.Add(new XAttribute("Calories", splittedcalories[1]));
+                        }
+                        else //이건 중간에 슬래시를 빼 먹은 것
+                        {
+                            Int32 length = splittedcalories[0].Length;
+                            if (length > 4)
+                            {
+                                if (length % 2 == 1 && splittedcalories[0][0] < splittedcalories[0][length / 2])//길이가 같거나, 앞 식단 자리수가 뒷 식단 자리수보다 큼
+                                {
+                                    xfoods1.Add(new XAttribute("Calories", splittedcalories[0].Substring(0, length / 2 + 1)));
+                                    xfoods2.Add(new XAttribute("Calories", splittedcalories[0].Substring(length / 2 + 1)));
+                                }
+                                else
+                                {
+                                    xfoods1.Add(new XAttribute("Calories", splittedcalories[0].Substring(0, length / 2)));
+                                    xfoods2.Add(new XAttribute("Calories", splittedcalories[0].Substring(length / 2)));
+                                }
+                            }
+                            else
+                            {
+                                xfoods1.Add(new XAttribute("Calories", splittedcalories[0]));
+                                xfoods2.Add(new XAttribute("Calories", -1));
+                            }
+                        }
                     }
                     else
                     {
