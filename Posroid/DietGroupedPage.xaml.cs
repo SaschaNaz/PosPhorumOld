@@ -181,7 +181,7 @@ namespace Posroid
                 IsNewDataNeeded = true;
 
             String message = null;
-            if (IsNewDataNeeded)
+            //if (IsNewDataNeeded)
             {
                 try
                 {
@@ -417,7 +417,20 @@ namespace Posroid
                         str += fontcode.Value;
                     }
                     if (str.Length > 0)//빈 문자열은 갖다 버린다!.. 왜 엔터는 쳐서 빈 곳을 만들어요 으아아
+                    {
+                        if (strfood.Count > 0)
+                        {
+                            String laststr = strfood.Last();
+                            Char last = laststr[laststr.Length - 1];
+                            Char first = str[0];
+                            if ((last == '/' && first != '/') || (last != '/' && first == '/'))
+                            {
+                                strfood.RemoveAt(strfood.Count - 1);
+                                str = laststr + str;
+                            }
+                        }
                         strfood.Add(str);
+                    }
                 }
             }
 
@@ -525,7 +538,7 @@ namespace Posroid
                         }
 
                         //문자열 처리부분
-                        String[] splitted = SplitIntoTwoBySlash(str);
+                        String[] splitted = SplitIntoTwoBySlashWithException(str);
                         Char PresentLineLanguage;
                         if (IsEnglish(str))
                             PresentLineLanguage = 'E';
@@ -766,6 +779,30 @@ namespace Posroid
         String[] SplitIntoTwoBySlash(String str)
         {
             return str.Split(new Char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        String[] SplitIntoTwoBySlashWithException(String str)
+        {
+            List<String> splitted = SplitIntoTwoBySlash(str).ToList();
+            for (Int32 i = splitted.Count - 1; i > 0; i--)
+            {
+                String firststr = splitted[i];
+                Char first = firststr[0];
+                if (first >= '0' && first <= '9')
+                {
+                    String laststr = splitted[i - 1];
+                    Char last = laststr[laststr.Length - 1];
+                    if (last >= '0' && first <= '9')
+                    {
+                        Int32 index = i;
+                        splitted.RemoveAt(i);
+                        splitted.RemoveAt(i - 1);
+                        laststr += '/' + firststr;
+                        splitted.Insert(index - 1, laststr);
+                    }
+                }
+            }
+            return splitted.ToArray();
         }
 
         /// <summary>
