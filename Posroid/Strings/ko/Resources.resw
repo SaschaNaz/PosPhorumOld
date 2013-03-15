@@ -127,7 +127,7 @@
     <value>아침</value>
   </data>
   <data name="DietPageTitle.Text" xml:space="preserve">
-    <value>Posmetro 식단</value>
+    <value>PosPhorum 식단</value>
   </data>
   <data name="Dinner" xml:space="preserve">
     <value>저녁</value>
