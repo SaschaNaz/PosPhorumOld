@@ -116,8 +116,8 @@
     <Compile Include="Common\BindableBase.cs" />
     <Compile Include="Common\BooleanNegationConverter.cs" />
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
-    <Compile Include="PrivacyPolicy.xaml.cs">
-      <DependentUpon>PrivacyPolicy.xaml</DependentUpon>
+    <Compile Include="LanguageControl.xaml.cs">
+      <DependentUpon>LanguageControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="CustomGridView.cs" />
     <Compile Include="DayDetailPage.xaml.cs">
@@ -134,8 +134,8 @@
       <DependentUpon>DietDay.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleSettingsNarrow.xaml.cs">
-      <DependentUpon>SimpleSettingsNarrow.xaml</DependentUpon>
+    <Compile Include="SettingsFlyout.xaml.cs">
+      <DependentUpon>SettingsFlyout.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -157,11 +157,11 @@
     <Content Include="Assets\SmallLogo.scale-180.png" />
     <Content Include="Assets\SmallLogo.scale-80.png" />
     <None Include="Package.StoreAssociation.xml" />
-    <Page Include="PrivacyPolicy.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="LanguageControl.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SimpleSettingsNarrow.xaml">
+    <Page Include="SettingsFlyout.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

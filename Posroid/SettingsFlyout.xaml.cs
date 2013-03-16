@@ -11,14 +11,14 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.Storage;
 using Windows.UI.ApplicationSettings;
-
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace Posroid
 {
-    public partial class PrivacyPolicy : UserControl
+    public sealed partial class SettingsFlyout : UserControl
     {
         public String Title
         {
@@ -28,15 +28,15 @@ namespace Posroid
 
         public static readonly DependencyProperty TitleProperty =
             DependencyProperty.Register("Title", typeof(String),
-            typeof(PrivacyPolicy), null);
+            typeof(SettingsFlyout), null);
 
-        public PrivacyPolicy()
+        public SettingsFlyout(String title, UIElement content)
         {
             this.InitializeComponent();
 
             this.DataContext = this;
-            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
-            Title = loader.GetString("PrivacyPolicyTitle");
+            Title = title;
+            Container.Children.Add(content as UIElement);
         }
 
         private void MySettingsBackClicked(object sender, RoutedEventArgs e)
