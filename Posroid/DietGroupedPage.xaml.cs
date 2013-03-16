@@ -62,7 +62,7 @@ namespace Posroid
 
         void DietGroupedPage_CommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
         {
-            SettingsCommand cmd = new SettingsCommand("sample", "Language", (x) =>
+            SettingsCommand cmd = new SettingsCommand("lang", "Language", (x) =>
                 {
                     Int32 _settingsWidth = 370;
                     Rect _windowBounds = Window.Current.Bounds;
@@ -81,7 +81,6 @@ namespace Posroid
                     mypane.SettingChanged += delegate(object sender2, GlobalSettingChangedEventArgs e)
                     {
                         ApplicationData.Current.LocalSettings.Values["ForceKorean"] = e.Value;
-                        Application.Current.Resources["ForceKorean"] = e.Value;
                         LanguageOptionUpdate();
                         //await new Windows.UI.Popups.MessageDialog(String.Format("Setting Changed: {0} / {1}", e.WhatSetting.ToString(), e.Value.ToString())).ShowAsync();
                     };                    
@@ -91,6 +90,31 @@ namespace Posroid
                     _settingsPopup.SetValue(Canvas.TopProperty, 0);
                     _settingsPopup.IsOpen = true;
                 });
+
+            args.Request.ApplicationCommands.Add(cmd);
+
+            cmd = new SettingsCommand("ppolicy", "Private Policy", (x) =>
+            {
+                Int32 _settingsWidth = 370;
+                Rect _windowBounds = Window.Current.Bounds;
+                _settingsPopup = new Popup();
+                _settingsPopup.Closed += OnPopupClosed;
+                Window.Current.Activated += OnWindowActivated;
+                _settingsPopup.IsLightDismissEnabled = true;
+                _settingsPopup.Width = _settingsWidth;
+                _settingsPopup.Height = _windowBounds.Height;
+
+                PrivacyPolicy mypane = new PrivacyPolicy()
+                {
+                    Width = _settingsWidth,
+                    Height = _windowBounds.Height
+                };
+
+                _settingsPopup.Child = mypane;
+                _settingsPopup.SetValue(Canvas.LeftProperty, _windowBounds.Width - _settingsWidth);
+                _settingsPopup.SetValue(Canvas.TopProperty, 0);
+                _settingsPopup.IsOpen = true;
+            });
 
             args.Request.ApplicationCommands.Add(cmd);
         }

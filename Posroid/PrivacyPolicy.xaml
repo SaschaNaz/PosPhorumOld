@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="Posroid.SimpleSettingsNarrow"
+    x:Class="Posroid.PrivacyPolicy"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Posroid"
@@ -149,7 +149,7 @@
                         <EntranceThemeTransition FromHorizontalOffset="120" />
                     </TransitionCollection>
                 </Grid.Transitions>
-                <ToggleSwitch x:Name="ForceKoreanToggle" x:Uid="ForceKorean" Toggled="ToggleSwitch_Toggled_1" />
+                <TextBlock x:Uid="PrivacyPolicyContent" TextWrapping="Wrap" FontSize="15" />
             </Grid>
 
         </Grid>

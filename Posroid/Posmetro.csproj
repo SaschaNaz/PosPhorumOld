@@ -116,6 +116,9 @@
     <Compile Include="Common\BindableBase.cs" />
     <Compile Include="Common\BooleanNegationConverter.cs" />
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
+    <Compile Include="PrivacyPolicy.xaml.cs">
+      <DependentUpon>PrivacyPolicy.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CustomGridView.cs" />
     <Compile Include="DayDetailPage.xaml.cs">
       <DependentUpon>DayDetailPage.xaml</DependentUpon>
@@ -154,6 +157,10 @@
     <Content Include="Assets\SmallLogo.scale-180.png" />
     <Content Include="Assets\SmallLogo.scale-80.png" />
     <None Include="Package.StoreAssociation.xml" />
+    <Page Include="PrivacyPolicy.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="SimpleSettingsNarrow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

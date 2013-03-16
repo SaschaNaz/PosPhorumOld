@@ -132,7 +132,21 @@
   <data name="Dinner" xml:space="preserve">
     <value>Dinner</value>
   </data>
+  <data name="ForceKorean.Header" xml:space="preserve">
+    <value>Force Korean on the names of the foods.</value>
+  </data>
+  <data name="LanguageTitle" xml:space="preserve">
+    <value>Language</value>
+  </data>
   <data name="Lunch" xml:space="preserve">
     <value>Lunch</value>
+  </data>
+  <data name="PrivacyPolicyContent.Text" xml:space="preserve">
+    <value>PosPhorum Privacy Policy
+
+Your information, that is, your IP and access time, may be logged by Postech server for preventing attacks like DoS. The log may be reserved permanently or arbitrarily destroyed. The log may be revealed by the request from Korean National Police Agency or any government organization that has the related authority.</value>
+  </data>
+  <data name="PrivacyPolicyTitle" xml:space="preserve">
+    <value>Privacy Policy</value>
   </data>
 </root>
