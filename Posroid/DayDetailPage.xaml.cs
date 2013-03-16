@@ -31,11 +31,9 @@ namespace Posroid
         Popup _settingsPopup;
         void DietGroupedPage_CommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
         {
-
             var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
-
-            
-            SettingsCommand cmd = new SettingsCommand("sample", "Language", (x) =>
+            var languageTitle = loader.GetString("LanguageTitle");
+            SettingsCommand cmd = new SettingsCommand("lang", languageTitle, (x) =>
             {
                 Int32 _settingsWidth = 370;
                 Rect _windowBounds = Window.Current.Bounds;
@@ -46,13 +44,15 @@ namespace Posroid
                 _settingsPopup.Width = _settingsWidth;
                 _settingsPopup.Height = _windowBounds.Height;
 
-                SimpleSettingsNarrow mypane = new SimpleSettingsNarrow()
+                LanguageControl control = new LanguageControl();
+                SettingsFlyout mypane = new SettingsFlyout(languageTitle, control)
                 {
                     Width = _settingsWidth,
                     Height = _windowBounds.Height
                 };
-                mypane.SettingChanged += delegate(object sender2, GlobalSettingChangedEventArgs e)
+                control.SettingChanged += delegate(object sender2, GlobalSettingChangedEventArgs e)
                 {
+
                     ApplicationData.Current.LocalSettings.Values["ForceKorean"] = e.Value;
                     Time[] abc = this.DefaultViewModel["MealTimes"] as Time[];
                     this.DefaultViewModel["MealTimes"] = null;
@@ -67,7 +67,8 @@ namespace Posroid
 
             args.Request.ApplicationCommands.Add(cmd);
 
-            cmd = new SettingsCommand("ppolicy", loader.GetString("Privacy Policy"), (x) =>
+            var ppolicyTitle = loader.GetString("PrivacyPolicyTitle");
+            cmd = new SettingsCommand("ppolicy", ppolicyTitle, (x) =>
             {
                 Int32 _settingsWidth = 370;
                 Rect _windowBounds = Window.Current.Bounds;
@@ -78,7 +79,7 @@ namespace Posroid
                 _settingsPopup.Width = _settingsWidth;
                 _settingsPopup.Height = _windowBounds.Height;
 
-                PrivacyPolicy mypane = new PrivacyPolicy()
+                SettingsFlyout mypane = new SettingsFlyout(ppolicyTitle, new TextBlock() { Text = loader.GetString("PrivacyPolicyContent"), TextWrapping = TextWrapping.Wrap, FontSize = 15 })
                 {
                     Width = _settingsWidth,
                     Height = _windowBounds.Height
