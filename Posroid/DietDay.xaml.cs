@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.Globalization.DateTimeFormatting;
+using Windows.Storage;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -121,7 +122,7 @@ namespace Posroid
             LangString ls = (LangString)value;
 
             String returner;
-            if (!(Boolean)Application.Current.Resources["ForceKorean"])
+            if (!(Boolean)ApplicationData.Current.LocalSettings.Values["ForceKorean"])
             {
                 //returns the name for OS default language for default value.
                 returner = ls.NameByLanguage(

@@ -31,6 +31,10 @@ namespace Posroid
         Popup _settingsPopup;
         void DietGroupedPage_CommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
         {
+
+            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+
+            
             SettingsCommand cmd = new SettingsCommand("sample", "Language", (x) =>
             {
                 Int32 _settingsWidth = 370;
@@ -50,10 +54,34 @@ namespace Posroid
                 mypane.SettingChanged += delegate(object sender2, GlobalSettingChangedEventArgs e)
                 {
                     ApplicationData.Current.LocalSettings.Values["ForceKorean"] = e.Value;
-                    Application.Current.Resources["ForceKorean"] = e.Value;
                     Time[] abc = this.DefaultViewModel["MealTimes"] as Time[];
                     this.DefaultViewModel["MealTimes"] = null;
                     this.DefaultViewModel["MealTimes"] = abc;
+                };
+
+                _settingsPopup.Child = mypane;
+                _settingsPopup.SetValue(Canvas.LeftProperty, _windowBounds.Width - _settingsWidth);
+                _settingsPopup.SetValue(Canvas.TopProperty, 0);
+                _settingsPopup.IsOpen = true;
+            });
+
+            args.Request.ApplicationCommands.Add(cmd);
+
+            cmd = new SettingsCommand("ppolicy", loader.GetString("Privacy Policy"), (x) =>
+            {
+                Int32 _settingsWidth = 370;
+                Rect _windowBounds = Window.Current.Bounds;
+                _settingsPopup = new Popup();
+                _settingsPopup.Closed += OnPopupClosed;
+                Window.Current.Activated += OnWindowActivated;
+                _settingsPopup.IsLightDismissEnabled = true;
+                _settingsPopup.Width = _settingsWidth;
+                _settingsPopup.Height = _windowBounds.Height;
+
+                PrivacyPolicy mypane = new PrivacyPolicy()
+                {
+                    Width = _settingsWidth,
+                    Height = _windowBounds.Height
                 };
 
                 _settingsPopup.Child = mypane;

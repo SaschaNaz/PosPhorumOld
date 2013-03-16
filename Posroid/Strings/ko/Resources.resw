@@ -132,7 +132,21 @@
   <data name="Dinner" xml:space="preserve">
     <value>저녁</value>
   </data>
+  <data name="ForceKorean.Header" xml:space="preserve">
+    <value>(영어권) 음식 이름에 한국어 사용 강제</value>
+  </data>
+  <data name="LanguageTitle" xml:space="preserve">
+    <value>언어</value>
+  </data>
   <data name="Lunch" xml:space="preserve">
     <value>점심</value>
+  </data>
+  <data name="PrivacyPolicyContent.Text" xml:space="preserve">
+    <value>포스포럼 개인 정보 보호 정책
+
+DoS와 같은 공격 방지를 위해 사용자의 IP 및 접속 시간이 포스텍 서버에 기록되어 영구 보존되거나 또는 임의적으로 파기될 수 있습니다. 대한민국 경찰 또는 권한이 있는 기관의 요청에 의해 정보가 노출될 수 있습니다.</value>
+  </data>
+  <data name="PrivacyPolicyTitle" xml:space="preserve">
+    <value>개인 정보 보호 정책</value>
   </data>
 </root>
