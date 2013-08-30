@@ -363,7 +363,7 @@ namespace Posroid
                             String[] daydayofweek = columns[0]
                                 .Elements().First()//p
                                 .Elements().First()//font
-                                .Value.Split('\n');//날짜 및 요일
+                                .Value.Split('(');//날짜 및 요일. Filtering by Split('\n') seldomly fails because '\n' disappears randomly.
                             String[] monthday = SplitIntoTwoBySlash(daydayofweek[0]);
                             xday.Add(
                                 new XAttribute("Month", Convert.ToInt32(monthday[0])),
@@ -835,7 +835,7 @@ namespace Posroid
             return str.Split(new Char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        String[] SplitIntoTwoBySlashWithException(String str)
+        String[] SplitIntoTwoBySlashWithException(String str)// results '쇠고기볶음밥', '삼계탕1/2' when splitting 쇠고기볶음밥/삼계탕1/2
         {
             List<String> splitted = SplitIntoTwoBySlash(str).ToList();
             for (Int32 i = splitted.Count - 1; i > 0; i--)
