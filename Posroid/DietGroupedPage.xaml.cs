@@ -57,6 +57,8 @@ namespace Posroid
         public DietGroupedPage()
         {
             this.InitializeComponent();
+            if (ApplicationData.Current.LocalSettings.Values["ForceKorean"] == null)
+                ApplicationData.Current.LocalSettings.Values["ForceKorean"] = false;
             //preferedLanguage = "ko";
         }
 
@@ -389,7 +391,7 @@ namespace Posroid
                             new XElement("Time",
                                 new XAttribute("When", "Dinner"),
                                 MakeFoodsElement(columns[4], columnscal[4], "B"),
-                                MakeDualFoodsElement(columns[6], columnscal[6], "C", "D")));
+                                columns.Length > 6 ? MakeDualFoodsElement(columns[6], columnscal[6], "C", "D") : null));
 
                         dietofweek.Add(xday);
                     }
