@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
-  <Identity Name="23018SaschaNaz.PosPhoRum" Publisher="CN=2EF7B4D5-F580-4A6A-B0D7-D68D385099A2" Version="1.0.0.11" />
+  <Identity Name="23018SaschaNaz.PosPhoRum" Publisher="CN=2EF7B4D5-F580-4A6A-B0D7-D68D385099A2" Version="1.0.0.13" />
   <Properties>
     <DisplayName>PosPhorum</DisplayName>
     <PublisherDisplayName>SaschaNaz</PublisherDisplayName>
@@ -16,7 +16,7 @@
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Posroid.App">
       <VisualElements DisplayName="PosPhorum" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="PosPhorum" ForegroundText="light" BackgroundColor="#C60150">
-        <DefaultTile ShowName="allLogos" />
+        <DefaultTile ShowName="logoOnly" />
         <SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#720130" />
       </VisualElements>
     </Application>

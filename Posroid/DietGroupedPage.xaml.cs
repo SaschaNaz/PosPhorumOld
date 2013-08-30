@@ -575,7 +575,7 @@ namespace Posroid
                     XElement xfood2 = null;
                     foreach (String str in strfood)
                     {
-                        Nullable<BracketData> bdata = ExtractBracket(str);
+                        Nullable<BracketData> bdata = ExtractBracket(str);//가끔 괄호 안에 '/'가 있는 바람에 파싱을 방해하므로 빼 놨다가 나중에 다시 붙임
                         String processed = String.Empty;
                         if (bdata.HasValue)
                         {
@@ -669,23 +669,17 @@ namespace Posroid
 
                         if (processed.Length > 0)
                         {
-                            //후처리부
+                            //앞에서 뺀 괄호 다시 더함
                             Int32 splitpoint = str.IndexOf('/');
                             XElement langToBeFixed;
                             if (splitpoint < bdata.Value.StartPoint)
-                            {
                                 langToBeFixed = xfood1.Elements().Last();
-                                XAttribute fixstr = langToBeFixed.Attribute("Value");
-                                fixstr.Remove();
-                                langToBeFixed.Add(new XAttribute("Value", (String)fixstr + bdata.Value.ExtractedString));
-                            }
                             else
-                            {
                                 langToBeFixed = xfood2.Elements().Last();
-                                XAttribute fixstr = langToBeFixed.Attribute("Value");
-                                fixstr.Remove();
-                                langToBeFixed.Add(new XAttribute("Value", (String)fixstr + bdata.Value.ExtractedString));
-                            }
+
+                            XAttribute fixstr = langToBeFixed.Attribute("Value");
+                            fixstr.Remove();
+                            langToBeFixed.Add(new XAttribute("Value", (String)fixstr + bdata.Value.ExtractedString));
                         }
                     }
 
@@ -694,7 +688,12 @@ namespace Posroid
                     if (xfood2.HasElements)
                         xfoods2.Add(xfood2);
 
-                    return new XElement[] { xfoods1, xfoods2 };
+                    var returner = new List<XElement>();
+                    if (!IsMealBlank(xfoods1))
+                        returner.Add(xfoods1);
+                    if (!IsMealBlank(xfoods2))
+                        returner.Add(xfoods2);
+                    return returner.ToArray();
                 }
                 else if (IsThereNoType1)
                     return new XElement[] { ParseSingleFoodData(strfood, calint, type2) };
@@ -857,6 +856,19 @@ namespace Posroid
                 }
             }
             return splitted.ToArray();
+        }
+
+        Boolean IsMealBlank(XElement xfoods)//코너가 하나뿐일 땐 <D코너> 등으로 표시하다 요즘은 그마저도 표시 안 하길래 따로 필터링
+        {
+            if (xfoods.Attribute("Calories").Value != "-1")
+                return false;
+            if (!xfoods.HasElements)
+                return true;
+
+            var foodNames = xfoods.Element("Food").Elements("Name").ToList();
+            if (foodNames[0].Attribute("Value").Value == "[이름 미등록]" && foodNames[1].Attribute("Value").Value == "[name unregistered]")
+                return true;
+            else return false;
         }
 
         /// <summary>
