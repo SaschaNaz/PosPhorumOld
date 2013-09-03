@@ -334,7 +334,8 @@ namespace Posroid
                 {
                     String str = await response.Content.ReadAsStringAsync();
                     str = str.Remove(200, 126);
-                    str = str.Replace("&nbsp;", " ");
+                    str = str.Replace("&nbsp;", "\u0020");
+                    str = str.Replace("&shy;", "\u00AD");
                     str = str.Replace("<br>", "<br />");
                     str = str.Remove(str.IndexOf("<![if !supportMisalignedRows]>"), str.IndexOf("<![endif]>") - str.IndexOf("<![if !supportMisalignedRows]>") + 10);
                     str = str.Replace("</html>", "</body></html>");
@@ -342,13 +343,21 @@ namespace Posroid
                     XElement[] tablerows;
                     {
                         XElement body = xelm.Element("body");
+                        XElement parenttable = null;
                         XElement table = null;
                         foreach(XElement xp in body.Elements("p"))
                         {
-                            table = xp.Element("table");
+                            parenttable = xp.Element("table");
+                            if (parenttable != null)
+                                break;
+                        }//contains first table
+
+                        foreach (XElement parenttablerow in parenttable.Element("tr").Element("td").Elements("p"))
+                        {
+                            table = parenttablerow.Element("table");
                             if (table != null)
                                 break;
-                        }//contains table
+                        }//contains second, meal table
                         tablerows = table.Elements().ToArray();//tablerows
                     }
 
