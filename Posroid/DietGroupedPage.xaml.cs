@@ -41,7 +41,7 @@ using Windows.Storage;
 using System.Threading.Tasks;
 using Windows.UI.ViewManagement;
 using Windows.UI.ApplicationSettings;
-
+using System.Text.RegularExpressions;
 
 // The Grouped Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234231
 
@@ -333,32 +333,36 @@ namespace Posroid
                 using (HttpResponseMessage response = await client.GetAsync(new Uri("http://page.postech.ac.kr/res1/")))
                 {
                     String str = await response.Content.ReadAsStringAsync();
-                    str = str.Remove(200, 126);
-                    str = str.Replace("&nbsp;", "\u0020");
-                    str = str.Replace("&shy;", "\u00AD");
-                    str = str.Replace("<br>", "<br />");
-                    str = str.Remove(str.IndexOf("<![if !supportMisalignedRows]>"), str.IndexOf("<![endif]>") - str.IndexOf("<![if !supportMisalignedRows]>") + 10);
-                    str = str.Replace("</html>", "</body></html>");
+                    str = str.Replace("&nbsp;", "\u0020")
+                        .Replace("&shy;", "\u00AD")
+                        .Replace("<BR>", "<br />")
+                        .Replace("<COL>", "<col></col>")
+                    //str = str.Remove(str.IndexOf("<![if !supportMisalignedRows]>"), str.IndexOf("<![endif]>") - str.IndexOf("<![if !supportMisalignedRows]>") + 10);
+                        .Replace("</TBODY></TABLE></DIV>", "</TBODY></TABLE></body>");
+                    Regex regex = new Regex(@"\w+=#?\w+");
+                    Int32 nextindex = 0;
+                    Match match = regex.Match(str);
+                    while (match.Value.Length != 0)
+                    {
+                        str = str.Replace(match.Value, "");
+                        nextindex = match.Index;
+                        match = regex.Match(str, nextindex);
+                    }
                     XElement xelm = XElement.Parse(str);
                     XElement[] tablerows;
                     {
                         XElement body = xelm.Element("body");
-                        XElement parenttable = null;
-                        XElement table = null;
-                        foreach(XElement xp in body.Elements("p"))
-                        {
-                            parenttable = xp.Element("table");
-                            if (parenttable != null)
-                                break;
-                        }//contains first table
+                        XElement parenttable = body.Element("TABLE");
+                        XElement table = null;//contains first table
 
-                        foreach (XElement parenttablerow in parenttable.Element("tr").Element("td").Elements("p"))
-                        {
-                            table = parenttablerow.Element("table");
-                            if (table != null)
-                                break;
-                        }//contains second, meal table
-                        tablerows = table.Elements().ToArray();//tablerows
+                        //foreach (XElement parenttablerow in parenttable.Element("tr").Element("td").Elements("p"))
+                        //{
+                        //    table = parenttablerow.Element("table");
+                        //    if (table != null)
+                        //        break;
+                        //}//contains second, meal table
+                        table = parenttable.Element("TBODY").Element("TR").Element("TD").Element("DIV").Element("DIV").Element("TABLE");
+                        tablerows = table.Element("TBODY").Elements().ToArray();//tablerows
                     }
 
                     for (Int32 i = 3; i < tablerows.Length - 1; i += 2)//each row is for a day, 기둥 뒤에 공간 있...는 게 아니라 표 끝에 빈 줄 하나 있습니다. 진짜예요 height=0으로..;;;
@@ -385,21 +389,21 @@ namespace Posroid
                         xday.Add(
                             new XElement("Time",
                                 new XAttribute("When", "Breakfast"),
-                                MakeFoodsElement(columns[1], columnscal[1], "B"),
-                                MakeFoodsElement(columns[2], columnscal[2], "C")));
+                                MakeFoodsElement(columns[1], columnscal[1], "A"),
+                                MakeFoodsElement(columns[2], columnscal[2], "B")));
 
                         //점심
                         xday.Add(
                             new XElement("Time",
                                 new XAttribute("When", "Lunch"),
-                                MakeFoodsElement(columns[3], columnscal[3], "B"),
+                                MakeFoodsElement(columns[3], columnscal[3], "A"),
                                 MakeDualFoodsElement(columns[5], columnscal[5], "C", "D")));
 
                         //저녁
                         xday.Add(
                             new XElement("Time",
                                 new XAttribute("When", "Dinner"),
-                                MakeFoodsElement(columns[4], columnscal[4], "B"),
+                                MakeFoodsElement(columns[4], columnscal[4], "A"),
                                 columns.Length > 6 ? MakeDualFoodsElement(columns[6], columnscal[6], "C", "D") : null));
 
                         dietofweek.Add(xday);
@@ -698,10 +702,10 @@ namespace Posroid
                         xfoods2.Add(xfood2);
 
                     var returner = new List<XElement>();
-                    if (!IsMealBlank(xfoods1))
-                        returner.Add(xfoods1);
                     if (!IsMealBlank(xfoods2))
                         returner.Add(xfoods2);
+                    if (!IsMealBlank(xfoods1))//D와 C의 순서가 이유는 몰라도 최근 바뀌었으므로 C보다 D를 앞으로.
+                        returner.Add(xfoods1);
                     return returner.ToArray();
                 }
                 else if (IsThereNoType1)
