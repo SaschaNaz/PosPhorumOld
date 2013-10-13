@@ -333,21 +333,36 @@ namespace Posroid
                 using (HttpResponseMessage response = await client.GetAsync(new Uri("http://page.postech.ac.kr/res1/")))
                 {
                     String str = await response.Content.ReadAsStringAsync();
-                    str = str.Replace("&nbsp;", "\u0020")
-                        .Replace("&shy;", "\u00AD")
-                        .Replace("<BR>", "<br />")
-                        .Replace("<COL>", "<col></col>")
-                    //str = str.Remove(str.IndexOf("<![if !supportMisalignedRows]>"), str.IndexOf("<![endif]>") - str.IndexOf("<![if !supportMisalignedRows]>") + 10);
-                        .Replace("</TBODY></TABLE></DIV>", "</TBODY></TABLE></body>");
-                    Regex regex = new Regex(@"\w+=#?\w+");
-                    Int32 nextindex = 0;
-                    Match match = regex.Match(str);
-                    while (match.Value.Length != 0)
+                    await Task.Run(() =>
                     {
-                        str = str.Replace(match.Value, "");
-                        nextindex = match.Index;
-                        match = regex.Match(str, nextindex);
-                    }
+                        str = str.Replace("&nbsp;", "\u0020")
+                            .Replace("&shy;", "\u00AD")
+                            .Replace("<BR>", "<br />")
+                            .Replace("<COL>", "<col></col>")
+                            //str = str.Remove(str.IndexOf("<![if !supportMisalignedRows]>"), str.IndexOf("<![endif]>") - str.IndexOf("<![if !supportMisalignedRows]>") + 10);
+                            .Replace("</TBODY></TABLE></DIV>", "</TBODY></TABLE></body>");
+                        //Illegal attributes
+                        Regex regex = new Regex(@"\w+=#?\w+");
+                        Int32 nextindex = 0;
+                        Match match = regex.Match(str);
+                        while (match.Value.Length != 0)
+                        {
+                            str = str.Replace(match.Value, "");
+                            nextindex = match.Index;
+                            match = regex.Match(str, nextindex);
+                        }
+
+                        //I don't know why but there are some tags like <TD style="..." 8  >
+                        regex = new Regex(@"\s[0-9]\s+\/?>");
+                        nextindex = 0;
+                        match = regex.Match(str);
+                        while (match.Value.Length != 0)
+                        {
+                            str = str.Replace(match.Value, ">");
+                            nextindex = match.Index;
+                            match = regex.Match(str, nextindex);
+                        }
+                    });
                     XElement xelm = XElement.Parse(str);
                     XElement[] tablerows;
                     {
@@ -365,7 +380,8 @@ namespace Posroid
                         tablerows = table.Element("TBODY").Elements().ToArray();//tablerows
                     }
 
-                    for (Int32 i = 3; i < tablerows.Length - 1; i += 2)//each row is for a day, 기둥 뒤에 공간 있...는 게 아니라 표 끝에 빈 줄 하나 있습니다. 진짜예요 height=0으로..;;;
+                    var startingRow = 3;
+                    for (Int32 i = startingRow; i <= startingRow + 14; i += 2)//each two rows are for a day
                     {
                         XElement xday = new XElement("Day");
                         XElement[] columns = tablerows[i].Elements().ToArray();
