@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Posphorum.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,112 +17,173 @@ using Windows.Storage;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
-namespace Posroid
+namespace Posphorum
 {
     /// <summary>
     /// A basic page that provides characteristics common to most applications.
     /// </summary>
-    public sealed partial class DayDetailPage : Posroid.Common.LayoutAwarePage
+    public sealed partial class DayDetailPage : Page
     {
-        public DayDetailPage()
+
+        private NavigationHelper navigationHelper;
+        private ObservableDictionary defaultViewModel = new ObservableDictionary();
+
+        /// <summary>
+        /// This can be changed to a strongly typed view model.
+        /// </summary>
+        public ObservableDictionary DefaultViewModel
         {
-            this.InitializeComponent();
-        }
-
-        Popup _settingsPopup;
-        void DietGroupedPage_CommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
-        {
-            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
-            var languageTitle = loader.GetString("LanguageTitle");
-            SettingsCommand cmd = new SettingsCommand("lang", languageTitle, (x) =>
-            {
-                Int32 _settingsWidth = 370;
-                Rect _windowBounds = Window.Current.Bounds;
-                _settingsPopup = new Popup();
-                _settingsPopup.Closed += OnPopupClosed;
-                Window.Current.Activated += OnWindowActivated;
-                _settingsPopup.IsLightDismissEnabled = true;
-                _settingsPopup.Width = _settingsWidth;
-                _settingsPopup.Height = _windowBounds.Height;
-
-                LanguageControl control = new LanguageControl();
-                SettingsFlyout mypane = new SettingsFlyout(languageTitle, control)
-                {
-                    Width = _settingsWidth,
-                    Height = _windowBounds.Height
-                };
-                control.SettingChanged += delegate(object sender2, GlobalSettingChangedEventArgs e)
-                {
-
-                    ApplicationData.Current.LocalSettings.Values["ForceKorean"] = e.Value;
-                    Time[] abc = this.DefaultViewModel["MealTimes"] as Time[];
-                    this.DefaultViewModel["MealTimes"] = null;
-                    this.DefaultViewModel["MealTimes"] = abc;
-                };
-
-                _settingsPopup.Child = mypane;
-                _settingsPopup.SetValue(Canvas.LeftProperty, _windowBounds.Width - _settingsWidth);
-                _settingsPopup.SetValue(Canvas.TopProperty, 0);
-                _settingsPopup.IsOpen = true;
-            });
-
-            args.Request.ApplicationCommands.Add(cmd);
-
-            var ppolicyTitle = loader.GetString("PrivacyPolicyTitle");
-            cmd = new SettingsCommand("ppolicy", ppolicyTitle, (x) =>
-            {
-                Int32 _settingsWidth = 370;
-                Rect _windowBounds = Window.Current.Bounds;
-                _settingsPopup = new Popup();
-                _settingsPopup.Closed += OnPopupClosed;
-                Window.Current.Activated += OnWindowActivated;
-                _settingsPopup.IsLightDismissEnabled = true;
-                _settingsPopup.Width = _settingsWidth;
-                _settingsPopup.Height = _windowBounds.Height;
-
-                SettingsFlyout mypane = new SettingsFlyout(ppolicyTitle, new TextBlock() { Text = loader.GetString("PrivacyPolicyContent"), TextWrapping = TextWrapping.Wrap, FontSize = 15 })
-                {
-                    Width = _settingsWidth,
-                    Height = _windowBounds.Height
-                };
-
-                _settingsPopup.Child = mypane;
-                _settingsPopup.SetValue(Canvas.LeftProperty, _windowBounds.Width - _settingsWidth);
-                _settingsPopup.SetValue(Canvas.TopProperty, 0);
-                _settingsPopup.IsOpen = true;
-            });
-
-            args.Request.ApplicationCommands.Add(cmd);
-        }
-
-        private void OnWindowActivated(object sender, Windows.UI.Core.WindowActivatedEventArgs e)
-        {
-            if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.Deactivated)
-            {
-                _settingsPopup.IsOpen = false;
-            }
-        }
-
-        void OnPopupClosed(object sender, object e)
-        {
-            Window.Current.Activated -= OnWindowActivated;
+            get { return this.defaultViewModel; }
         }
 
         /// <summary>
-        /// Populates the page with content passed during navigation.  Any saved state is also
+        /// NavigationHelper is used on each page to aid in navigation and 
+        /// process lifetime management
+        /// </summary>
+        public NavigationHelper NavigationHelper
+        {
+            get { return this.navigationHelper; }
+        }
+
+
+        public DayDetailPage()
+        {
+            this.InitializeComponent();
+            this.navigationHelper = new NavigationHelper(this);
+            this.navigationHelper.LoadState += navigationHelper_LoadState;
+            this.navigationHelper.SaveState += navigationHelper_SaveState;
+        }
+
+        //Popup _settingsPopup;
+        //void DietGroupedPage_CommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
+        //{
+        //    var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+        //    var languageTitle = loader.GetString("LanguageTitle");
+        //    SettingsCommand cmd = new SettingsCommand("lang", languageTitle, (x) =>
+        //    {
+        //        Int32 _settingsWidth = 370;
+        //        Rect _windowBounds = Window.Current.Bounds;
+        //        _settingsPopup = new Popup();
+        //        _settingsPopup.Closed += OnPopupClosed;
+        //        Window.Current.Activated += OnWindowActivated;
+        //        _settingsPopup.IsLightDismissEnabled = true;
+        //        _settingsPopup.Width = _settingsWidth;
+        //        _settingsPopup.Height = _windowBounds.Height;
+
+        //        LanguageControl control = new LanguageControl();
+        //        SettingsFlyout mypane = new SettingsFlyout(languageTitle, control)
+        //        {
+        //            Width = _settingsWidth,
+        //            Height = _windowBounds.Height
+        //        };
+        //        control.SettingChanged += delegate(object sender2, GlobalSettingChangedEventArgs e)
+        //        {
+
+        //            ApplicationData.Current.LocalSettings.Values["ForceKorean"] = e.Value;
+        //            Time[] abc = this.DefaultViewModel["MealTimes"] as Time[];
+        //            this.DefaultViewModel["MealTimes"] = null;
+        //            this.DefaultViewModel["MealTimes"] = abc;
+        //        };
+
+        //        _settingsPopup.Child = mypane;
+        //        _settingsPopup.SetValue(Canvas.LeftProperty, _windowBounds.Width - _settingsWidth);
+        //        _settingsPopup.SetValue(Canvas.TopProperty, 0);
+        //        _settingsPopup.IsOpen = true;
+        //    });
+
+        //    args.Request.ApplicationCommands.Add(cmd);
+
+        //    var ppolicyTitle = loader.GetString("PrivacyPolicyTitle");
+        //    cmd = new SettingsCommand("ppolicy", ppolicyTitle, (x) =>
+        //    {
+        //        Int32 _settingsWidth = 370;
+        //        Rect _windowBounds = Window.Current.Bounds;
+        //        _settingsPopup = new Popup();
+        //        _settingsPopup.Closed += OnPopupClosed;
+        //        Window.Current.Activated += OnWindowActivated;
+        //        _settingsPopup.IsLightDismissEnabled = true;
+        //        _settingsPopup.Width = _settingsWidth;
+        //        _settingsPopup.Height = _windowBounds.Height;
+
+        //        SettingsFlyout mypane = new SettingsFlyout(ppolicyTitle, new TextBlock() { Text = loader.GetString("PrivacyPolicyContent"), TextWrapping = TextWrapping.Wrap, FontSize = 15 })
+        //        {
+        //            Width = _settingsWidth,
+        //            Height = _windowBounds.Height
+        //        };
+
+        //        _settingsPopup.Child = mypane;
+        //        _settingsPopup.SetValue(Canvas.LeftProperty, _windowBounds.Width - _settingsWidth);
+        //        _settingsPopup.SetValue(Canvas.TopProperty, 0);
+        //        _settingsPopup.IsOpen = true;
+        //    });
+
+        //    args.Request.ApplicationCommands.Add(cmd);
+        //}
+
+        //private void OnWindowActivated(object sender, Windows.UI.Core.WindowActivatedEventArgs e)
+        //{
+        //    if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.Deactivated)
+        //    {
+        //        _settingsPopup.IsOpen = false;
+        //    }
+        //}
+
+        //void OnPopupClosed(object sender, object e)
+        //{
+        //    Window.Current.Activated -= OnWindowActivated;
+        //}
+
+        private void PageUnloaded(object sender, RoutedEventArgs e)
+        {
+            Window.Current.SizeChanged -= Current_SizeChanged;
+        }
+
+        private void PageLoaded(object sender, RoutedEventArgs e)
+        {
+            changeState(ActualWidth);
+            Window.Current.SizeChanged += Current_SizeChanged;
+        }
+
+        void Current_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
+        {
+            changeState(e.Size.Width);
+        }
+
+        String changeState(Double Width)
+        {
+            String stateName;
+            if (Width > 500)
+            {
+                var winOrientation = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().Orientation;
+                if (winOrientation == Windows.UI.ViewManagement.ApplicationViewOrientation.Portrait)
+                    stateName = "FullScreenPortrait";
+                else
+                    stateName = "FullScreenLandscape";
+            }
+            else
+                stateName = "Snapped";
+
+            VisualStateManager.GoToState(this, stateName, true);
+            return stateName;
+        }
+
+        /// <summary>
+        /// Populates the page with content passed during navigation. Any saved state is also
         /// provided when recreating a page from a prior session.
         /// </summary>
-        /// <param name="navigationParameter">The parameter value passed to
-        /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested.
+        /// <param name="sender">
+        /// The source of the event; typically <see cref="NavigationHelper"/>
         /// </param>
-        /// <param name="pageState">A dictionary of state preserved by this page during an earlier
-        /// session.  This will be null the first time a page is visited.</param>
-        protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
+        /// <param name="e">Event data that provides both the navigation parameter passed to
+        /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
+        /// a dictionary of state preserved by this page during an earlier
+        /// session. The state will be null the first time a page is visited.</param>
+        private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            if (navigationParameter != null)
-                this.DefaultViewModel["MealTimes"] = (navigationParameter as Day).Times;
-            this.DefaultViewModel["ServedDate"] = (navigationParameter as Day).ServedDate;
-            SettingsPane.GetForCurrentView().CommandsRequested += DietGroupedPage_CommandsRequested;
+            if (e.NavigationParameter != null)
+                this.DefaultViewModel["MealTimes"] = (e.NavigationParameter as Day).Times;
+            this.DefaultViewModel["ServedDate"] = (e.NavigationParameter as Day).ServedDate;
+            //SettingsPane.GetForCurrentView().CommandsRequested += DietGroupedPage_CommandsRequested;
         }
 
         /// <summary>
@@ -129,10 +191,37 @@ namespace Posroid
         /// page is discarded from the navigation cache.  Values must conform to the serialization
         /// requirements of <see cref="SuspensionManager.SessionState"/>.
         /// </summary>
-        /// <param name="pageState">An empty dictionary to be populated with serializable state.</param>
-        protected override void SaveState(Dictionary<String, Object> pageState)
+        /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
+        /// <param name="e">Event data that provides an empty dictionary to be populated with
+        /// serializable state.</param>
+        private void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
-            SettingsPane.GetForCurrentView().CommandsRequested -= DietGroupedPage_CommandsRequested;
+            //SettingsPane.GetForCurrentView().CommandsRequested -= DietGroupedPage_CommandsRequested;
         }
+
+        #region NavigationHelper registration
+
+        /// The methods provided in this section are simply used to allow
+        /// NavigationHelper to respond to the page's navigation methods.
+        /// 
+        /// Page specific logic should be placed in event handlers for the  
+        /// <see cref="GridCS.Common.NavigationHelper.LoadState"/>
+        /// and <see cref="GridCS.Common.NavigationHelper.SaveState"/>.
+        /// The navigation parameter is available in the LoadState method 
+        /// in addition to page state preserved during an earlier session.
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            navigationHelper.OnNavigatedTo(e);
+            this.Loaded += PageLoaded;
+            this.Unloaded += PageUnloaded;
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            navigationHelper.OnNavigatedFrom(e);
+        }
+
+        #endregion
     }
 }
