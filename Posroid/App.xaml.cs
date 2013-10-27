@@ -40,14 +40,23 @@ namespace Posphorum
         {
             SettingsPane.GetForCurrentView().CommandsRequested += (s, e) =>
             {
-                SettingsCommand defaultsCommand = new SettingsCommand("ppolicy", 
+                SettingsCommand cmd = new SettingsCommand("ppolicy", 
                     new Windows.ApplicationModel.Resources.ResourceLoader().GetString("PrivacyPolicySettingsTitle"),
                     (handler) =>
                     {
                         var sf = new PrivacyPolicyFlyout();
                         sf.Show();
                     });
-                e.Request.ApplicationCommands.Add(defaultsCommand);
+                e.Request.ApplicationCommands.Add(cmd);
+
+                cmd = new SettingsCommand("options",
+                    new Windows.ApplicationModel.Resources.ResourceLoader().GetString("Options"),
+                    (handler) =>
+                    {
+                        var sf = new GlobalSettingsFlyout();
+                        sf.Show();
+                    });
+                e.Request.ApplicationCommands.Add(cmd);
             };
 
             base.OnWindowCreated(args);
@@ -102,6 +111,35 @@ namespace Posphorum
         }
     }
 
+    public delegate void SettingChangedEventHandler(object sender, SettingChangedEventArgs e);
+    public class SettingChangedEventArgs : EventArgs
+    {
+        public SettingTypes SettingType;
+        public Object SettingValue;
+    }
+    public enum SettingTypes
+    {
+        ForceKorean
+    }
+
+    public class SettingChangeNotifier
+    {
+
+        public void ReportSettingChange(SettingChangedEventArgs e)
+        {
+            OnSettingChanged(e);
+        }
+
+        public event SettingChangedEventHandler SettingChanged;
+
+        protected virtual void OnSettingChanged(SettingChangedEventArgs e)
+        {
+            if (SettingChanged != null)
+            {
+                SettingChanged(this, e);
+            }
+        }
+    }
 
     public class DateConverter : Windows.UI.Xaml.Data.IValueConverter
     {
@@ -205,9 +243,7 @@ namespace Posphorum
                     new Windows.Globalization.Language(Windows.Globalization.ApplicationLanguages.Languages[0]));
             }
             else
-            {
                 returner = ls.NameByLanguage(new Windows.Globalization.Language("ko"));
-            }
 
             if (parameter != null)
                 return parameter + returner;

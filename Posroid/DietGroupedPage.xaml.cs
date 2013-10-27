@@ -86,6 +86,24 @@ namespace Posphorum
             this.navigationHelper.SaveState += navigationHelper_SaveState;
         }
 
+        void registerToNotifier()
+        {
+            var notifier = (SettingChangeNotifier)Application.Current.Resources["settingChangeNotifier"];
+            notifier.SettingChanged += updateAsSettingChanged;
+        }
+
+        void unregisterToNotifier()
+        {
+            var notifier = (SettingChangeNotifier)Application.Current.Resources["settingChangeNotifier"];
+            notifier.SettingChanged -= updateAsSettingChanged;
+        }
+
+        void updateAsSettingChanged(object sender, SettingChangedEventArgs e)
+        {
+            if (e.SettingType == SettingTypes.ForceKorean)
+                LanguageOptionUpdate();
+        }
+
         //void DietGroupedPage_CommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
         //{
         //    var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
@@ -973,6 +991,7 @@ namespace Posphorum
             }
             await SetData(false, previousScrollOffset, snapped);
             //SettingsPane.GetForCurrentView().CommandsRequested += DietGroupedPage_CommandsRequested;
+            registerToNotifier();
         }
 
         /// <summary>
@@ -994,6 +1013,7 @@ namespace Posphorum
                 e.PageState["ScrollOffset"] = GetVisualChild<ScrollViewer>(itemListView).VerticalOffset;
 
             //SettingsPane.GetForCurrentView().CommandsRequested -= DietGroupedPage_CommandsRequested;
+            unregisterToNotifier();
         }
 
         #region NavigationHelper registration

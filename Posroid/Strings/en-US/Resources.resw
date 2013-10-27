@@ -141,6 +141,9 @@
   <data name="Lunch" xml:space="preserve">
     <value>Lunch</value>
   </data>
+  <data name="Options" xml:space="preserve">
+    <value>Options</value>
+  </data>
   <data name="PrivacyPolicyContent.Text" xml:space="preserve">
     <value>Your information, that is, your IP and access time, may be logged by Postech server for preventing attacks like DoS. The log may be reserved permanently or arbitrarily deleted. The log may be revealed by the request from Korean National Police Agency or any government organization that has the related authority.</value>
   </data>

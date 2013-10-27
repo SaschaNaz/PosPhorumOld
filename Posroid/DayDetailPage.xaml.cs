@@ -54,6 +54,28 @@ namespace Posphorum
             this.navigationHelper.SaveState += navigationHelper_SaveState;
         }
 
+        void registerToNotifier()
+        {
+            var notifier = (SettingChangeNotifier)Application.Current.Resources["settingChangeNotifier"];
+            notifier.SettingChanged += updateAsSettingChanged;
+        }
+
+        void unregisterToNotifier()
+        {
+            var notifier = (SettingChangeNotifier)Application.Current.Resources["settingChangeNotifier"];
+            notifier.SettingChanged -= updateAsSettingChanged;
+        }
+
+        void updateAsSettingChanged(object sender, SettingChangedEventArgs e)
+        {
+            if (e.SettingType == SettingTypes.ForceKorean)
+            {
+                Time[] abc = this.DefaultViewModel["MealTimes"] as Time[];
+                this.DefaultViewModel["MealTimes"] = null;
+                this.DefaultViewModel["MealTimes"] = abc;
+            }
+        }
+
         //Popup _settingsPopup;
         //void DietGroupedPage_CommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
         //{
@@ -184,6 +206,7 @@ namespace Posphorum
                 this.DefaultViewModel["MealTimes"] = (e.NavigationParameter as Day).Times;
             this.DefaultViewModel["ServedDate"] = (e.NavigationParameter as Day).ServedDate;
             //SettingsPane.GetForCurrentView().CommandsRequested += DietGroupedPage_CommandsRequested;
+            registerToNotifier();
         }
 
         /// <summary>
@@ -197,6 +220,7 @@ namespace Posphorum
         private void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
             //SettingsPane.GetForCurrentView().CommandsRequested -= DietGroupedPage_CommandsRequested;
+            unregisterToNotifier();
         }
 
         #region NavigationHelper registration

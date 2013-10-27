@@ -222,7 +222,7 @@
             </ListView>
         </Grid>
         
-        <Grid x:Name="TextListContainer" Visibility="Collapsed" Grid.Column="1" Width="370">
+        <Grid x:Name="TextListContainer" Visibility="Collapsed" Grid.Column="1" Width="346">
             <ListView x:Name="textList" Margin="10,30,40,30" SelectionMode="None" >
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>

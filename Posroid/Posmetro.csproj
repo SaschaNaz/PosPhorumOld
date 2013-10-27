@@ -132,8 +132,8 @@
       <DependentUpon>DietGroupedPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Diet.cs" />
-    <Compile Include="LanguageSettingsFlyout.xaml.cs">
-      <DependentUpon>LanguageSettingsFlyout.xaml</DependentUpon>
+    <Compile Include="GlobalSettingsFlyout.xaml.cs">
+      <DependentUpon>GlobalSettingsFlyout.xaml</DependentUpon>
     </Compile>
     <Compile Include="PrivacyPolicyFlyout.xaml.cs">
       <DependentUpon>PrivacyPolicyFlyout.xaml</DependentUpon>
@@ -164,7 +164,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="LanguageSettingsFlyout.xaml">
+    <Page Include="GlobalSettingsFlyout.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
