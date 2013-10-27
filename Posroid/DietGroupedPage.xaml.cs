@@ -21,7 +21,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
+using Posphorum.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,7 +36,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Xml.Linq;
-using System.Net.Http;
+using Windows.Web.Http;
 using Windows.Storage;
 using System.Threading.Tasks;
 using Windows.UI.ViewManagement;
@@ -45,14 +45,35 @@ using System.Text.RegularExpressions;
 
 // The Grouped Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234231
 
-namespace Posroid
+namespace Posphorum
 {
     /// <summary>
     /// A page that displays a grouped collection of items.
     /// </summary>
-    public sealed partial class DietGroupedPage : Posroid.Common.LayoutAwarePage
+    public sealed partial class DietGroupedPage : Page
     {
-        Popup _settingsPopup;
+        private NavigationHelper navigationHelper;
+        private ObservableDictionary defaultViewModel = new ObservableDictionary();
+
+        /// <summary>
+        /// This can be changed to a strongly typed view model.
+        /// </summary>
+        public ObservableDictionary DefaultViewModel
+        {
+            get { return this.defaultViewModel; }
+        }
+
+        /// <summary>
+        /// NavigationHelper is used on each page to aid in navigation and 
+        /// process lifetime management
+        /// </summary>
+        public NavigationHelper NavigationHelper
+        {
+            get { return this.navigationHelper; }
+        }
+
+
+        //Popup _settingsPopup;
 
         public DietGroupedPage()
         {
@@ -60,83 +81,86 @@ namespace Posroid
             if (ApplicationData.Current.LocalSettings.Values["ForceKorean"] == null)
                 ApplicationData.Current.LocalSettings.Values["ForceKorean"] = false;
             //preferedLanguage = "ko";
+            this.navigationHelper = new NavigationHelper(this);
+            this.navigationHelper.LoadState += navigationHelper_LoadState;
+            this.navigationHelper.SaveState += navigationHelper_SaveState;
         }
 
-        void DietGroupedPage_CommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
-        {
-            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
-            var languageTitle = loader.GetString("LanguageTitle");
-            SettingsCommand cmd = new SettingsCommand("lang", languageTitle, (x) =>
-                {
-                    Int32 _settingsWidth = 370;
-                    Rect _windowBounds = Window.Current.Bounds;
-                    _settingsPopup = new Popup();
-                    _settingsPopup.Closed += OnPopupClosed;
-                    Window.Current.Activated += OnWindowActivated;
-                    _settingsPopup.IsLightDismissEnabled = true;
-                    _settingsPopup.Width = _settingsWidth;
-                    _settingsPopup.Height = _windowBounds.Height;
+        //void DietGroupedPage_CommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
+        //{
+        //    var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+        //    var languageTitle = loader.GetString("LanguageTitle");
+        //    SettingsCommand cmd = new SettingsCommand("lang", languageTitle, (x) =>
+        //        {
+        //            Int32 _settingsWidth = 370;
+        //            Rect _windowBounds = Window.Current.Bounds;
+        //            _settingsPopup = new Popup();
+        //            _settingsPopup.Closed += OnPopupClosed;
+        //            Window.Current.Activated += OnWindowActivated;
+        //            _settingsPopup.IsLightDismissEnabled = true;
+        //            _settingsPopup.Width = _settingsWidth;
+        //            _settingsPopup.Height = _windowBounds.Height;
 
-                    LanguageControl control = new LanguageControl();
-                    SettingsFlyout mypane = new SettingsFlyout(languageTitle, control)
-                    {
-                        Width = _settingsWidth,
-                        Height = _windowBounds.Height
-                    };
-                    control.SettingChanged += delegate(object sender2, GlobalSettingChangedEventArgs e)
-                    {
-                        ApplicationData.Current.LocalSettings.Values["ForceKorean"] = e.Value;
-                        LanguageOptionUpdate();
-                        //await new Windows.UI.Popups.MessageDialog(String.Format("Setting Changed: {0} / {1}", e.WhatSetting.ToString(), e.Value.ToString())).ShowAsync();
-                    };                    
+        //            LanguageControl control = new LanguageControl();
+        //            SettingsFlyout mypane = new SettingsFlyout(languageTitle, control)
+        //            {
+        //                Width = _settingsWidth,
+        //                Height = _windowBounds.Height
+        //            };
+        //            control.SettingChanged += delegate(object sender2, GlobalSettingChangedEventArgs e)
+        //            {
+        //                ApplicationData.Current.LocalSettings.Values["ForceKorean"] = e.Value;
+        //                LanguageOptionUpdate();
+        //                //await new Windows.UI.Popups.MessageDialog(String.Format("Setting Changed: {0} / {1}", e.WhatSetting.ToString(), e.Value.ToString())).ShowAsync();
+        //            };                    
 
-                    _settingsPopup.Child = mypane;
-                    _settingsPopup.SetValue(Canvas.LeftProperty, _windowBounds.Width - _settingsWidth);
-                    _settingsPopup.SetValue(Canvas.TopProperty, 0);
-                    _settingsPopup.IsOpen = true;
-                });
+        //            _settingsPopup.Child = mypane;
+        //            _settingsPopup.SetValue(Canvas.LeftProperty, _windowBounds.Width - _settingsWidth);
+        //            _settingsPopup.SetValue(Canvas.TopProperty, 0);
+        //            _settingsPopup.IsOpen = true;
+        //        });
 
-            args.Request.ApplicationCommands.Add(cmd);
+        //    args.Request.ApplicationCommands.Add(cmd);
 
-            var ppolicyTitle = loader.GetString("PrivacyPolicyTitle");
-            cmd = new SettingsCommand("ppolicy", ppolicyTitle, (x) =>
-            {
-                Int32 _settingsWidth = 370;
-                Rect _windowBounds = Window.Current.Bounds;
-                _settingsPopup = new Popup();
-                _settingsPopup.Closed += OnPopupClosed;
-                Window.Current.Activated += OnWindowActivated;
-                _settingsPopup.IsLightDismissEnabled = true;
-                _settingsPopup.Width = _settingsWidth;
-                _settingsPopup.Height = _windowBounds.Height;
+        //    var ppolicyTitle = loader.GetString("PrivacyPolicyTitle");
+        //    cmd = new SettingsCommand("ppolicy", ppolicyTitle, (x) =>
+        //    {
+        //        Int32 _settingsWidth = 370;
+        //        Rect _windowBounds = Window.Current.Bounds;
+        //        _settingsPopup = new Popup();
+        //        _settingsPopup.Closed += OnPopupClosed;
+        //        Window.Current.Activated += OnWindowActivated;
+        //        _settingsPopup.IsLightDismissEnabled = true;
+        //        _settingsPopup.Width = _settingsWidth;
+        //        _settingsPopup.Height = _windowBounds.Height;
 
-                SettingsFlyout mypane = new SettingsFlyout(ppolicyTitle, new TextBlock() { Text = loader.GetString("PrivacyPolicyContent"), TextWrapping = TextWrapping.Wrap, FontSize = 15 })
-                {
-                    Width = _settingsWidth,
-                    Height = _windowBounds.Height
-                };
+        //        SettingsFlyout mypane = new SettingsFlyout(ppolicyTitle, new TextBlock() { Text = loader.GetString("PrivacyPolicyContent"), TextWrapping = TextWrapping.Wrap, FontSize = 15 })
+        //        {
+        //            Width = _settingsWidth,
+        //            Height = _windowBounds.Height
+        //        };
 
-                _settingsPopup.Child = mypane;
-                _settingsPopup.SetValue(Canvas.LeftProperty, _windowBounds.Width - _settingsWidth);
-                _settingsPopup.SetValue(Canvas.TopProperty, 0);
-                _settingsPopup.IsOpen = true;
-            });
+        //        _settingsPopup.Child = mypane;
+        //        _settingsPopup.SetValue(Canvas.LeftProperty, _windowBounds.Width - _settingsWidth);
+        //        _settingsPopup.SetValue(Canvas.TopProperty, 0);
+        //        _settingsPopup.IsOpen = true;
+        //    });
 
-            args.Request.ApplicationCommands.Add(cmd);
-        }
+        //    args.Request.ApplicationCommands.Add(cmd);
+        //}
 
-        private void OnWindowActivated(object sender, Windows.UI.Core.WindowActivatedEventArgs e)
-        {
-            if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.Deactivated)
-            {
-                _settingsPopup.IsOpen = false;
-            }
-        }
+        //private void OnWindowActivated(object sender, Windows.UI.Core.WindowActivatedEventArgs e)
+        //{
+        //    if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.Deactivated)
+        //    {
+        //        _settingsPopup.IsOpen = false;
+        //    }
+        //}
 
-        void OnPopupClosed(object sender, object e)
-        {
-            Window.Current.Activated -= OnWindowActivated;
-        }
+        //void OnPopupClosed(object sender, object e)
+        //{
+        //    Window.Current.Activated -= OnWindowActivated;
+        //}
 
         void LanguageOptionUpdate()
         {
@@ -162,43 +186,67 @@ namespace Posroid
         //    get;
         //    set;
         //}
-        
+        private void PageUnloaded(object sender, RoutedEventArgs e)
+        {
+            Window.Current.SizeChanged -= Current_SizeChanged;
+        }
 
-        ApplicationViewState previousViewState;
+        private void PageLoaded(object sender, RoutedEventArgs e)
+        {
+            changeState(ActualWidth);
+            Window.Current.SizeChanged += Current_SizeChanged;
+        }
+
+        Boolean IsSnapped()
+        {
+            return itemListView.Visibility != Visibility.Collapsed;
+        }
+
         void Current_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
         {
-            ApplicationViewState myViewState = ApplicationView.Value;
-
             IsSwitching = true;
-            switch (myViewState)
+            var isSnapped = IsSnapped();
+            switch (changeState(e.Size.Width))
             {
-                case ApplicationViewState.Snapped:
+                case "Snapped":
+                    if (!isSnapped)
                     {
                         itemListView.SelectedItems.Clear();
                         foreach (Object o in textList.Items)
-                        {
                             itemListView.SelectedItems.Add(o);
-                        }
-                        break;
                     }
+                    break;
                 default:
+                    if (isSnapped)
                     {
-                        if (previousViewState == ApplicationViewState.Snapped)
-                        {
-                            itemGridView.SelectedItems.Clear();
-                            foreach (Object o in textList.Items)
-                            {
-                                itemGridView.SelectedItems.Add(o);
-                            }
-                        }
-                        break;
+                        itemGridView.SelectedItems.Clear();
+                        foreach (Object o in textList.Items)
+                            itemGridView.SelectedItems.Add(o);
                     }
+                    break;
             }
-            previousViewState = myViewState;
             IsSwitching = false;
         }
 
-        async Task SetData(Boolean ForceDataReload, Double scrollOffset, Char offsetDirection)
+        String changeState(Double Width)
+        {
+            String stateName;
+            if (Width > 500)
+            {
+                var winOrientation = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().Orientation;
+                if (winOrientation == Windows.UI.ViewManagement.ApplicationViewOrientation.Portrait)
+                    stateName = "FullScreenPortrait";
+                else
+                    stateName = "FullScreenLandscape";
+            }
+            else
+                stateName = "Snapped";
+
+            VisualStateManager.GoToState(this, stateName, true);
+            return stateName;
+        }
+
+        async Task SetData(Boolean ForceDataReload, Double scrollOffset, Boolean snapped)
         {
             semanticView.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             Boolean IsNewDataNeeded = false;
@@ -258,7 +306,7 @@ namespace Posroid
                         }
                     }
                 }
-                catch (HttpRequestException)
+                catch //(HttpRequestException)
                 {
                     message = "서버에 문제가 있거나 인터넷 연결이 원활하지 않습니다. 상태를 확인해 주신 후 앺 바에서 리프레시 버튼을 눌러 시간표를 다시 읽어 주시기 바랍니다.";
                 }
@@ -268,7 +316,7 @@ namespace Posroid
             RoutedEventHandler handler = null;
             handler = delegate
             {
-                setOffset(scrollOffset, offsetDirection);
+                setOffset(scrollOffset, snapped);
                 itemGridView.Loaded -= handler;
             };
             itemGridView.Loaded += handler;
@@ -278,12 +326,12 @@ namespace Posroid
                 await new Windows.UI.Popups.MessageDialog(message).ShowAsync();
         }
 
-        void setOffset(Double scrollOffset, Char offsetDirection)
+        void setOffset(Double scrollOffset, Boolean snapped)
         {
-            if (ApplicationView.Value != ApplicationViewState.Snapped)
+            if (!IsSnapped())
             {
-                if (scrollOffset >= 0 && offsetDirection == 'H')
-                    GetVisualChild<ScrollViewer>(itemGridView).ScrollToHorizontalOffset(scrollOffset);
+                if (scrollOffset >= 0 && !snapped)
+                    GetVisualChild<ScrollViewer>(itemGridView).ChangeView(scrollOffset, null, null);
                 else
                 {
                     foreach (object o in itemGridView.Items)
@@ -298,8 +346,8 @@ namespace Posroid
             }
             else
             {
-                if (scrollOffset >= 0 && offsetDirection == 'V')
-                    GetVisualChild<ScrollViewer>(itemListView).ScrollToVerticalOffset(scrollOffset);
+                if (scrollOffset >= 0 && snapped)
+                    GetVisualChild<ScrollViewer>(itemListView).ChangeView(null, scrollOffset, null);
                 else
                 {
                     foreach (object o in itemListView.Items)
@@ -901,29 +949,30 @@ namespace Posroid
         }
 
         /// <summary>
-        /// Populates the page with content passed during navigation.  Any saved state is also
+        /// Populates the page with content passed during navigation. Any saved state is also
         /// provided when recreating a page from a prior session.
         /// </summary>
-        /// <param name="navigationParameter">The parameter value passed to
-        /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested.
+        /// <param name="sender">
+        /// The source of the event; typically <see cref="NavigationHelper"/>
         /// </param>
-        /// <param name="pageState">A dictionary of state preserved by this page during an earlier
-        /// session.  This will be null the first time a page is visited.</param>
-        protected override async void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
+        /// <param name="e">Event data that provides both the navigation parameter passed to
+        /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
+        /// a dictionary of state preserved by this page during an earlier
+        /// session. The state will be null the first time a page is visited.</param>
+        private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
             // TODO: Assign a collection of bindable groups to this.DefaultViewModel["Groups"]
             Double previousScrollOffset = -1;
-            Char previousDirection = 'H';
-            if (pageState != null)
+            Boolean snapped = false;
+            if (e.PageState != null)
             {
-                if (pageState.ContainsKey("ScrollOffset"))
-                    previousScrollOffset = (Double)pageState["ScrollOffset"];
-                if (pageState.ContainsKey("PageViewState"))
-                    previousDirection = (Char)pageState["PageViewState"];
+                if (e.PageState.ContainsKey("ScrollOffset"))
+                    previousScrollOffset = (Double)e.PageState["ScrollOffset"];
+                if (e.PageState.ContainsKey("PageViewState"))
+                    snapped = (Boolean)e.PageState["PageViewState"];
             }
-            await SetData(false, previousScrollOffset, previousDirection);
-            SettingsPane.GetForCurrentView().CommandsRequested += DietGroupedPage_CommandsRequested;
-            Window.Current.SizeChanged += Current_SizeChanged;
+            await SetData(false, previousScrollOffset, snapped);
+            //SettingsPane.GetForCurrentView().CommandsRequested += DietGroupedPage_CommandsRequested;
         }
 
         /// <summary>
@@ -931,31 +980,46 @@ namespace Posroid
         /// page is discarded from the navigation cache.  Values must conform to the serialization
         /// requirements of <see cref="SuspensionManager.SessionState"/>.
         /// </summary>
-        /// <param name="pageState">An empty dictionary to be populated with serializable state.</param>
-        protected override void SaveState(Dictionary<String, Object> pageState)
+        /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
+        /// <param name="e">Event data that provides an empty dictionary to be populated with
+        /// serializable state.</param>
+        private void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
-            Char direction;
-            if (ApplicationView.Value == ApplicationViewState.Snapped)
-                direction = 'V';
+            Boolean snapped = IsSnapped();
+            
+            e.PageState["PageViewState"] = snapped;
+            if (!snapped)
+                e.PageState["ScrollOffset"] = GetVisualChild<ScrollViewer>(itemGridView).HorizontalOffset;     
             else
-                direction = 'H';
-            pageState["PageViewState"] = direction;
-            switch(direction)
-            {
-                case 'H':
-                    {
-                        pageState["ScrollOffset"] = GetVisualChild<ScrollViewer>(itemGridView).HorizontalOffset;
-                        break;
-                    }
-                case 'V':
-                    {
-                        pageState["ScrollOffset"] = GetVisualChild<ScrollViewer>(itemListView).VerticalOffset;
-                        break;
-                    }
-            }
-            SettingsPane.GetForCurrentView().CommandsRequested -= DietGroupedPage_CommandsRequested;
-            Window.Current.SizeChanged -= Current_SizeChanged;
+                e.PageState["ScrollOffset"] = GetVisualChild<ScrollViewer>(itemListView).VerticalOffset;
+
+            //SettingsPane.GetForCurrentView().CommandsRequested -= DietGroupedPage_CommandsRequested;
         }
+
+        #region NavigationHelper registration
+
+        /// The methods provided in this section are simply used to allow
+        /// NavigationHelper to respond to the page's navigation methods.
+        /// 
+        /// Page specific logic should be placed in event handlers for the  
+        /// <see cref="GridCS.Common.NavigationHelper.LoadState"/>
+        /// and <see cref="GridCS.Common.NavigationHelper.SaveState"/>.
+        /// The navigation parameter is available in the LoadState method 
+        /// in addition to page state preserved during an earlier session.
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            navigationHelper.OnNavigatedTo(e);
+            this.Loaded += PageLoaded;
+            this.Unloaded += PageUnloaded;
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            navigationHelper.OnNavigatedFrom(e);
+        }
+
+        #endregion
 
         public T GetVisualChild<T>(DependencyObject parent) where T : DependencyObject
         {
@@ -1041,21 +1105,17 @@ namespace Posroid
         async Task Refresh()
         {
             Application.Current.Resources.Remove("NewDataChecked");
-            Char direction;
-            if (ApplicationView.Value != ApplicationViewState.Snapped)
-                direction = 'H';
-            else
-                direction = 'V';
+            Boolean snapped = IsSnapped();
             Double offset;
             ScrollViewer viewer = GetVisualChild<ScrollViewer>(itemGridView);
             if (viewer != null)
-                if (direction == 'V')
+                if (snapped)
                     offset = viewer.VerticalOffset;
                 else//'H'
                     offset = viewer.HorizontalOffset;
             else
                 offset = 0;
-            await SetData(true, offset, direction);
+            await SetData(true, offset, snapped);
         }
 
         private void NavigateClicked(object sender, RoutedEventArgs e)

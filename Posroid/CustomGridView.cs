@@ -7,7 +7,7 @@ using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace Posroid
+namespace Posphorum
 {
     class CustomGridView : GridView
     {

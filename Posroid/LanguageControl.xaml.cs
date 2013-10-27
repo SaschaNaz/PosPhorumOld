@@ -15,7 +15,7 @@ using Windows.Storage;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
-namespace Posroid
+namespace Posphorum
 {
     public delegate void GlobalSettingChangedEventHandler(object sender, GlobalSettingChangedEventArgs e);
     public class GlobalSettingChangedEventArgs : EventArgs
