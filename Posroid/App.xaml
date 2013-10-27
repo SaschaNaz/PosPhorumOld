@@ -15,7 +15,7 @@
             <local:IntCaloriesConverter x:Key="intCaloriesConverter" />
             <!--<local:MealFoodConverter x:Key="mealFoodConverter" />-->
             <!--<x:String x:Key="preferedLanguage">ko</x:String>-->
-            <x:Boolean x:Key="ForceKorean">False</x:Boolean>
+            <local:SettingChangeNotifier x:Key="settingChangeNotifier" />
 
             <Style x:Key="SlimTextBlockButtonStyle" TargetType="Button" BasedOn="{StaticResource TextBlockButtonStyle}" >
                 <Setter Property="Template">

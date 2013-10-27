@@ -1,5 +1,5 @@
 ﻿<SettingsFlyout
-    x:Class="Posphorum.LanguageSettingsFlyout"
+    x:Class="Posphorum.GlobalSettingsFlyout"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Posphorum"
@@ -31,7 +31,9 @@
 
         </StackPanel>
 
+        
         <!-- Define more Content Sections below as necessary -->
+        <ToggleSwitch x:Name="ForceKoreanToggle" x:Uid="ForceKorean" />
 
     </StackPanel>
 </SettingsFlyout>
