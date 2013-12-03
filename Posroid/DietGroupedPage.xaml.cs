@@ -430,20 +430,18 @@ namespace Posphorum
                         }
                     });
                     XElement xelm = XElement.Parse(str);
-                    XElement[] tablerows;
+                    XElement[] tablerows = null;
                     {
                         XElement body = xelm.Element("body");
-                        XElement parenttable = body.Element("TABLE");
-                        XElement table = null;//contains first table
-
-                        //foreach (XElement parenttablerow in parenttable.Element("tr").Element("td").Elements("p"))
-                        //{
-                        //    table = parenttablerow.Element("table");
-                        //    if (table != null)
-                        //        break;
-                        //}//contains second, meal table
-                        table = parenttable.Element("TBODY").Element("TR").Element("TD").Element("DIV").Element("DIV").Element("TABLE");
-                        tablerows = table.Element("TBODY").Elements().ToArray();//tablerows
+                        XElement[] tables = body.Descendants("TBODY").ToArray();
+                        foreach (XElement table in tables)
+                        {
+                            XElement[] rows = table.Elements().ToArray();
+                            if (rows.Length >= 14) {
+                                tablerows = rows;
+                                break;
+                            }    
+                        }
                     }
 
                     var startingRow = 3;

@@ -41,7 +41,7 @@ namespace Posphorum
             SettingsPane.GetForCurrentView().CommandsRequested += (s, e) =>
             {
                 SettingsCommand cmd = new SettingsCommand("ppolicy", 
-                    new Windows.ApplicationModel.Resources.ResourceLoader().GetString("PrivacyPolicySettingsTitle"),
+                    new Windows.ApplicationModel.Resources.ResourceLoader().GetString("PrivacyPolicy"),
                     (handler) =>
                     {
                         var sf = new PrivacyPolicyFlyout();

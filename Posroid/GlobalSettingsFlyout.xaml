@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     IconSource="Assets/SmallLogo.png"
-    Title="LanguageSettingsFlyout"
+    x:Uid="OptionsTitle"
+    Title=""
     d:DesignWidth="346">
 
     <!-- This StackPanel acts as a root panel for vertical layout of the content sections -->
@@ -19,21 +20,15 @@
         <StackPanel Style="{StaticResource SettingsFlyoutSectionStyle}">
 
             <!-- Section 1 header -->
-            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Lorem ipsum" />
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" x:Uid="Language" Text="" />
 
             <!-- Section 1 body -->
-            <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap">
-                <TextBlock.Text>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </TextBlock.Text>
-            </TextBlock>
+            <ToggleSwitch x:Name="ForceKoreanToggle" x:Uid="ForceKorean" />
 
         </StackPanel>
 
         
         <!-- Define more Content Sections below as necessary -->
-        <ToggleSwitch x:Name="ForceKoreanToggle" x:Uid="ForceKorean" />
 
     </StackPanel>
 </SettingsFlyout>
