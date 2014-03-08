@@ -324,9 +324,15 @@ namespace Posphorum
                         }
                     }
                 }
-                catch //(HttpRequestException)
+                catch (FormatException)
                 {
-                    message = "서버에 문제가 있거나 인터넷 연결이 원활하지 않습니다. 상태를 확인해 주신 후 앺 바에서 리프레시 버튼을 눌러 시간표를 다시 읽어 주시기 바랍니다.";
+                    var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+                    message = loader.GetString("FormatException");//"식단표 형식이 바뀌어 현재 PosPhorum에서 식단표를 읽어들일 수 없습니다. 새로운 형식에 맞춘 PosPhorum 업데이트를 기다려 주세요. 업데이트가 계속 나오지 않으면 saschanaz@outlook.com으로 문제를 신고해 주세요.";
+                }
+                catch
+                {
+                    var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+                    message = loader.GetString("UnknownException");//"서버에 문제가 있거나 인터넷 연결이 원활하지 않습니다. 상태를 확인해 주신 후 앺 바에서 리프레시 버튼을 눌러 시간표를 다시 읽어 주시기 바랍니다.";
                 }
                 //localSettings.Values["dietMenuData"] = dietMenu.Stringify();
             }
@@ -402,38 +408,27 @@ namespace Posphorum
                     await Task.Run(() =>
                     {
                         str = str.Replace("&nbsp;", "\u0020")
-                            .Replace("&shy;", "\u00AD")
-                            .Replace("<BR>", "<br />")
-                            .Replace("<COL>", "<col></col>")
+                            .Replace("&shy;", "\u00AD");
                             //str = str.Remove(str.IndexOf("<![if !supportMisalignedRows]>"), str.IndexOf("<![endif]>") - str.IndexOf("<![if !supportMisalignedRows]>") + 10);
-                            .Replace("</TBODY></TABLE></DIV>", "</TBODY></TABLE></body>");
+
+                        str = Regex.Replace(str, @"<(\w+)", m => m.Value.ToLower());
+                        str = Regex.Replace(str, @"<br>", "<br/>");
+                        str = Regex.Replace(str, @"(</tbody>)\s+(</table>)\s+</div>", "$1$2</body>");
+                        
+                        //<col>s
+                        str = Regex.Replace(str, @"(<col\s.+>)", "$1</col>");
+
                         //Illegal attributes
-                        Regex regex = new Regex(@"\w+=#?\w+");
-                        Int32 nextindex = 0;
-                        Match match = regex.Match(str);
-                        while (match.Value.Length != 0)
-                        {
-                            str = str.Replace(match.Value, "");
-                            nextindex = match.Index;
-                            match = regex.Match(str, nextindex);
-                        }
+                        str = Regex.Replace(str, @"\w+=#?\w+", "");
 
                         //I don't know why but there are some tags like <TD style="..." 8  >
-                        regex = new Regex(@"\s[0-9]\s+\/?>");
-                        nextindex = 0;
-                        match = regex.Match(str);
-                        while (match.Value.Length != 0)
-                        {
-                            str = str.Replace(match.Value, ">");
-                            nextindex = match.Index;
-                            match = regex.Match(str, nextindex);
-                        }
+                        str = Regex.Replace(str, @"\s[0-9]\s+\/?>", ">");
                     });
                     XElement xelm = XElement.Parse(str);
                     XElement[] tablerows = null;
                     {
                         XElement body = xelm.Element("body");
-                        XElement[] tables = body.Descendants("TBODY").ToArray();
+                        XElement[] tables = body.Descendants("tbody").ToArray();
                         foreach (XElement table in tables)
                         {
                             XElement[] rows = table.Elements().ToArray();
