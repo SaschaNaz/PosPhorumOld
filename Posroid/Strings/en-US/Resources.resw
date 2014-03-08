@@ -135,6 +135,9 @@
   <data name="ForceKorean.Header" xml:space="preserve">
     <value>Force Korean on the names of the foods.</value>
   </data>
+  <data name="FormatException" xml:space="preserve">
+    <value>PosPhorum currently cannot load diet menus because the format has been changed. Please wait for an update to fix this, or submit an issue to saschanaz@outlook.com when you see no update for a long time.</value>
+  </data>
   <data name="Language.Text" xml:space="preserve">
     <value>Language</value>
   </data>
@@ -158,5 +161,8 @@
   </data>
   <data name="PrivacyPolicyTitle.Title" xml:space="preserve">
     <value>Privacy Policy</value>
+  </data>
+  <data name="UnknownException" xml:space="preserve">
+    <value>PosPhorum could not download any diet menu from our server. This may be our internal problem or your computer's network problem. Please check the situation and load the diet menu later tapping Refresh button on the app bar.</value>
   </data>
 </root>
